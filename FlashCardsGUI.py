@@ -5,12 +5,12 @@ from random import randint
 
 class GUI (Frame):
 
-    # Honestly no idea
+    # Honestly no idea what this does
     def __init__(self, master=None):
 
-        # TODO #1. Show the words the user needs to study and the words that the user got correct DONE (SEE 1.1)
-        # TODO #1.1 -> Port it to GUI
-        # TODO #1.2 -> If 2 pairs are in both good and bad dictionary, automatically move it to bad dictionary
+        # TODO #1. Show the words the user needs to study and the words that the user got correct (SEE 1.1) !!DONE!!
+        # TODO #1.1 -> Port it to GUI and create "Done" button to make ^ functional
+        # TODO #1.2 -> If 2 pairs are in both good and bad dictionary, automatically move it to bad dictionary !!DONE!!
         # TODO #2. Show dictionary as the user updates it
         # TODO #3. Database functionality
 
@@ -103,12 +103,6 @@ class GUI (Frame):
             except KeyError:
                 return False
 
-        # Delete items from dictionary given the key
-        def delete_key(d, key):
-            r = dict(d)
-            del r[key]
-            return r
-
         # <----- END MAIN FUNCTIONS ----->
 
         # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
@@ -134,23 +128,26 @@ class GUI (Frame):
                 self.answer_response["text"] = "Wrong!"
                 for i in main_dictionary:
                     if i == key_answer:
+                        # Matches the correct words together and stores it in the bad_dictionary{}
                         bad_dictionary[main_dictionary[i]] = key_answer
                         print("Bad Dictionary:")
                         print(bad_dictionary)
                         print("Good Dictionary:")
                         print(good_dictionary)
 
+                # If the pair is found in both the good and the bad dictionary, by default, delete the
+                # Entry from the good_dictionary{} and move it to the bad_dictionary, as they got it wrong
                 for key in bad_dictionary.keys():
-                    if key in good_dictionary.keys():  # TODO Fix error here
-                        delete_key(good_dictionary, key)
-                        print("Bad Dictionary:")
-                        print(bad_dictionary)
-                        print("Good Dictionary:")
-                        print(good_dictionary)
+                    if key in good_dictionary.keys():
+                        del good_dictionary[key]
+
+                # TODO After this is ported to GUI, make sure to delete!
+                print("Bad Dictionary:")
+                print(bad_dictionary)
+                print("Good Dictionary:")
+                print(good_dictionary)
 
 
 if __name__ == "__main__":
     guiFrame = GUI()
     guiFrame.mainloop()
-
-'''Hey smile'''
