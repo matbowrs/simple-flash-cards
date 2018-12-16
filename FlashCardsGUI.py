@@ -9,10 +9,12 @@ class GUI (Frame):
     def __init__(self, master=None):
 
         # TODO #1. Show the words the user needs to study and the words that the user got correct (SEE 1.1) !!DONE!!
-        # TODO #1.1 -> Port it to GUI and create "Done" button to make ^ functional
+        # TODO #1.1 -> Port it to GUI and create "Done" button to make #1 functional
         # TODO #1.2 -> If 2 pairs are in both good and bad dictionary, automatically move it to bad dictionary !!DONE!!
         # TODO #2. Show dictionary as the user updates it
         # TODO #3. Database functionality
+        # TODO #4. Add how many times the user got each pair correct; not critical
+        # TODO #5. When showing the final dictionary, remove functioanlity for check_answer()
 
         # <-- BEGIN DICTIONARY DECLARATIONS -->
 
@@ -45,7 +47,7 @@ class GUI (Frame):
         self.title.grid(column=3, row=0)
 
         # Label for showing whether the answer was correct or not
-        self.answer_response = tk.Label(text="Correct Or Not?")
+        self.answer_response = tk.Label(text="")
         self.answer_response.grid(column=3, row=5)
         # <--- END LABELS --->
 
@@ -82,6 +84,24 @@ class GUI (Frame):
             main_dictionary[def_1] = def_2
             print(main_dictionary)
 
+            # When the user is fully done with the program and wants to show what they got correct
+        def show_final_dictionaries():
+
+            good_pair_list = []
+            bad_pair_list = []
+
+            self.title["text"] = "What you got correct: "
+            self.text_entry_1.grid_forget()
+            self.text_entry_2.grid_forget()
+
+            self.answer_response.grid_forget()
+
+            for key in good_dictionary.items():
+                good_pair_list.append(key)
+
+            for key in bad_dictionary.items():
+                bad_pair_list.append(key)
+
         # Submit button
         self.submit_button = tk.Button(master, text="Create Pair", command=button_click)
         self.submit_button.grid(column=3, row=6)
@@ -92,8 +112,20 @@ class GUI (Frame):
             self.submit_button["command"] = check_answer
 
             # Create a button for next_entry
-            next_entry_button = tk.Button(text="Next", command=next_entry)
-            next_entry_button.grid(column=4, row=6)
+            self.next_entry_button = tk.Button(text="Next", command=next_entry)
+            self.next_entry_button.grid(column=4, row=6)
+
+            # Remove the quiz button from the UI
+            self.quiz_button.grid_forget()
+
+            # Done button for when user is done taking the quiz; replaces self.quiz_button
+            self.done_button = tk.Button(master, text="Done", command=show_final_dictionaries)
+            self.done_button.grid(column=3, row=7)
+
+        # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
+        # values
+        self.quiz_button = tk.Button(master, text="Quiz Me!", command=quiz_click)
+        self.quiz_button.grid(column=3, row=7)
 
         # Check if pair is in the dictionary
         def check_exist(dic, key, value):
@@ -104,11 +136,6 @@ class GUI (Frame):
                 return False
 
         # <----- END MAIN FUNCTIONS ----->
-
-        # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
-        # values
-        self.quiz_button = tk.Button(master, text="Quiz Me!", command=quiz_click)
-        self.quiz_button.grid(column=3, row=7)
 
         # Function to check answer
         def check_answer():
@@ -122,6 +149,12 @@ class GUI (Frame):
             if does_pair_exist_bool:
                 self.answer_response["text"] = "Correct!"
                 good_dictionary[user_answer] = key_answer
+
+                # If the entry is in the bad_dictionary{} and the user got it correct, move to good_dictionary{}
+                for key in good_dictionary.keys():
+                    if key in bad_dictionary.keys():
+                        del bad_dictionary[key]
+
                 print("Good Dictionary:")
                 print(good_dictionary)
             else:
