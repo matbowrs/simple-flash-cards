@@ -9,12 +9,12 @@ class GUI (Frame):
     def __init__(self, master=None):
 
         # TODO #1. Show the words the user needs to study and the words that the user got correct (SEE 1.1) !!DONE!!
-        # TODO #1.1 -> Port it to GUI and create "Done" button to make #1 functional
+        # TODO #1.1 -> Port it to GUI and create "Done" button to make #1 functional !!DONE!!
         # TODO #1.2 -> If 2 pairs are in both good and bad dictionary, automatically move it to bad dictionary !!DONE!!
         # TODO #2. Show dictionary as the user updates it
         # TODO #3. Database functionality
         # TODO #4. Add how many times the user got each pair correct; not critical
-        # TODO #5. When showing the final dictionary, remove functioanlity for check_answer()
+        # TODO #5. When showing the final dictionary, remove functionality for check_answer()
 
         # <-- BEGIN DICTIONARY DECLARATIONS -->
 
@@ -84,23 +84,35 @@ class GUI (Frame):
             main_dictionary[def_1] = def_2
             print(main_dictionary)
 
-            # When the user is fully done with the program and wants to show what they got correct
+        # When the user is fully done with the program and wants to show what they got correct
         def show_final_dictionaries():
 
             good_pair_list = []
             bad_pair_list = []
 
             self.title["text"] = "What you got correct: "
+            self.title_2 = tk.Label(text="What you got wrong: ")
+            self.title_2.grid(column=3, row=4)
+            # Delete all of these fields
             self.text_entry_1.grid_forget()
             self.text_entry_2.grid_forget()
-
             self.answer_response.grid_forget()
 
+            # Store everything in the good dictionary into the good list
             for key in good_dictionary.items():
                 good_pair_list.append(key)
 
+            # Store everything in the bad dictionary into the bad list
             for key in bad_dictionary.items():
                 bad_pair_list.append(key)
+
+            # Show the good pairs in the UI
+            self.good_dictionary_label = tk.Label(text=good_pair_list)
+            self.good_dictionary_label.grid(column=3, row=3)
+
+            # Show the bad pairs in the UI
+            self.bad_dictionary_label = tk.Label(text=bad_pair_list)
+            self.bad_dictionary_label.grid(column=3, row=5)
 
         # Submit button
         self.submit_button = tk.Button(master, text="Create Pair", command=button_click)
