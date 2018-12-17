@@ -11,7 +11,9 @@ class GUI (Frame):
         # TODO #1. Show the words the user needs to study and the words that the user got correct (SEE 1.1) !!DONE!!
         # TODO #1.1 -> Port it to GUI and create "Done" button to make #1 functional !!DONE!!
         # TODO #1.2 -> If 2 pairs are in both good and bad dictionary, automatically move it to bad dictionary !!DONE!!
-        # TODO #2. Show dictionary as the user updates it
+
+        # TODO #2. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
+        # TODO #2.1 If this feature is kept, problem with dictionary length
         # TODO #3. Database functionality
         # TODO #4. Add how many times the user got each pair correct; not critical
         # TODO #5. When showing the final dictionary, remove functionality for check_answer()
@@ -77,11 +79,23 @@ class GUI (Frame):
             print(my_list[rand_num])
             set_text(my_list[rand_num])
 
+        # Goes with the button_click() below, declared here for global scope
+        self.show_dictionary_as_user_updates = tk.Label(text="")
+
         # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
+        # Also displays what the user is typing
         def button_click():
             def_1 = str(self.text_entry_1.get())
             def_2 = str(self.text_entry_2.get())
             main_dictionary[def_1] = def_2
+
+            # Show the dictionary as the user enters pairs
+            self.store_dict_values = []
+            for key in main_dictionary.items():
+                self.store_dict_values.append(key)
+
+            self.show_dictionary_as_user_updates["text"] = self.store_dict_values
+            self.show_dictionary_as_user_updates.grid(column=4, row=3)
             print(main_dictionary)
 
         # When the user is fully done with the program and wants to show what they got correct
@@ -93,6 +107,7 @@ class GUI (Frame):
             self.title["text"] = "What you got correct: "
             self.title_2 = tk.Label(text="What you got wrong: ")
             self.title_2.grid(column=3, row=4)
+
             # Delete all of these fields
             self.text_entry_1.grid_forget()
             self.text_entry_2.grid_forget()
@@ -120,6 +135,9 @@ class GUI (Frame):
 
         # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
         def quiz_click():
+            # Hides the dictionary entries
+            self.show_dictionary_as_user_updates.grid_forget()
+
             self.submit_button["text"] = "Check Answer"
             self.submit_button["command"] = check_answer
 
