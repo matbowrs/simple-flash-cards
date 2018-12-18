@@ -8,15 +8,17 @@ class GUI (Frame):
     # Honestly no idea what this does
     def __init__(self, master=None):
 
-        # TODO #1. Show the words the user needs to study and the words that the user got correct (SEE 1.1) !!DONE!!
-        # TODO #1.1 -> Port it to GUI and create "Done" button to make #1 functional !!DONE!!
-        # TODO #1.2 -> If 2 pairs are in both good and bad dictionary, automatically move it to bad dictionary !!DONE!!
+        # TODO #1. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
 
-        # TODO #2. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
-        # TODO #2.1 If this feature is kept, problem with dictionary length
-        # TODO #3. Database functionality
-        # TODO #4. Add how many times the user got each pair correct; not critical
-        # TODO #5. When showing the final dictionary, remove functionality for check_answer()
+        # TODO #1.1 If this feature is kept, problem with dictionary length
+        # TODO #2. Database functionality
+        # TODO #3. Add how many times the user got each pair correct; not critical & see 7
+        # TODO #4. When showing the final dictionary, remove functionality for check_answer()
+        # TODO #5. Redo GUI?
+        # TODO #6. Which definition is most right / most wrong
+        # TODO #7. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
+        # TODO #8. If user gets definition wrong twice, then show the definition
+        # TODO #9. Remove all "print()" in final build
 
         # <-- BEGIN DICTIONARY DECLARATIONS -->
 
@@ -69,15 +71,39 @@ class GUI (Frame):
             self.text_entry_1.insert(0, text)
             return
 
+        '''def edit_function():
+            self.edit_label = tk.Label(text="Enter the value entered in the first box, hit enter, then enter"
+                                            "the new value.")
+            self.edit_label.grid(column=4, row=3)
+            self.edit_text_entry = tk.Entry()
+            self.edit_text_entry.grid(column=4, row=4)
+            self.next_entry_button["text"] = "Save Change"
+
+            get_new_edit = self.edit_text_entry.get()
+            print(get_new_edit)
+        # Create a button for next_entry
+        self.next_entry_button = tk.Button(text="Edit", command=edit_function)
+        self.next_entry_button.grid(column=4, row=6) '''
+
         # When you hit the Next button, this function is called and displays next value
         def next_entry():
-            rand_num = randint(0, len(main_dictionary) - 1)
+            list_of_keys = []
             my_list = []
 
             for x in main_dictionary:
                 my_list.append(x)
-            print(my_list[rand_num])
+
+            list_of_keys.append(self.text_entry_1.get())
+
+            # Used for selection when choosing a value for quizzing the user
+            rand_num = randint(0, len(main_dictionary) - 1)
+
+            # If the last entry and the new entry-to-be are the same, make the new entry-to-be different
+            while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
+                rand_num = randint(0, len(main_dictionary) - 1)
+
             set_text(my_list[rand_num])
+            print(my_list[rand_num])
 
         # Goes with the button_click() below, declared here for global scope
         self.show_dictionary_as_user_updates = tk.Label(text="")
@@ -141,6 +167,7 @@ class GUI (Frame):
             self.submit_button["text"] = "Check Answer"
             self.submit_button["command"] = check_answer
 
+            # TODO On click, change this button's text to next, command= next_entry
             # Create a button for next_entry
             self.next_entry_button = tk.Button(text="Next", command=next_entry)
             self.next_entry_button.grid(column=4, row=6)
@@ -169,7 +196,6 @@ class GUI (Frame):
 
         # Function to check answer
         def check_answer():
-
             key_answer = str(self.text_entry_1.get())  # Get input from text_entry_1
             user_answer = str(self.text_entry_2.get())  # Get input from text_entry_2
 
@@ -187,6 +213,8 @@ class GUI (Frame):
 
                 print("Good Dictionary:")
                 print(good_dictionary)
+                print("Bad Dictionary:")
+                print(bad_dictionary)
             else:
                 self.answer_response["text"] = "Wrong!"
                 for i in main_dictionary:
