@@ -71,21 +71,54 @@ class GUI (Frame):
             self.text_entry_1.insert(0, text)
             return
 
-        '''def edit_function():
-            self.edit_label = tk.Label(text="Enter the value entered in the first box, hit enter, then enter"
-                                            "the new value.")
-            self.edit_label.grid(column=4, row=3)
-            self.edit_text_entry = tk.Entry()
-            self.edit_text_entry.grid(column=4, row=4)
-            self.next_entry_button["text"] = "Save Change"
+        # Goes with the button_click() below, declared here for global scope
+        self.show_dictionary_as_user_updates = tk.Label(text="")
 
-            get_new_edit = self.edit_text_entry.get()
-            print(get_new_edit)
-        # Create a button for next_entry
-        self.next_entry_button = tk.Button(text="Edit", command=edit_function)
-        self.next_entry_button.grid(column=4, row=6) '''
+        # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
+        # Also displays what the user is typing
+        def create_pair_function():
+            def_1 = str(self.text_entry_1.get())
+            def_2 = str(self.text_entry_2.get())
+            main_dictionary[def_1] = def_2
 
-        # When you hit the Next button, this function is called and displays next value
+            # Show the dictionary as the user enters pairs
+            self.store_dict_values = []
+            for key in main_dictionary.items():
+                self.store_dict_values.append(key)
+
+            self.show_dictionary_as_user_updates["text"] = self.store_dict_values
+            self.show_dictionary_as_user_updates.grid(column=4, row=3)
+            print(main_dictionary)
+
+        # Submit button
+        self.submit_button = tk.Button(master, text="Create Pair", command=create_pair_function)
+        self.submit_button.grid(column=3, row=6)
+
+        # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
+        def quiz_click():
+            # Hides the dictionary entries
+            self.show_dictionary_as_user_updates.grid_forget()
+
+            self.submit_button["text"] = "Check Answer"
+            self.submit_button["command"] = check_answer
+
+            # Create a button for next_entry
+            self.next_entry_button = tk.Button(text="Next", command=next_entry)
+            self.next_entry_button.grid(column=4, row=6)
+
+            # Remove the quiz button from the UI
+            self.quiz_button.grid_forget()
+
+            # Done button for when user is done taking the quiz; replaces self.quiz_button
+            self.done_button = tk.Button(master, text="Done", command=show_final_dictionaries)
+            self.done_button.grid(column=3, row=7)
+
+        # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
+        # values
+        self.quiz_button = tk.Button(master, text="Quiz Me!", command=quiz_click)
+        self.quiz_button.grid(column=3, row=7)
+
+        # When you hit the Next button, this function is called and displays next value; comes during quiz
         def next_entry():
             list_of_keys = []
             my_list = []
@@ -105,85 +138,6 @@ class GUI (Frame):
             set_text(my_list[rand_num])
             print(my_list[rand_num])
 
-        # Goes with the button_click() below, declared here for global scope
-        self.show_dictionary_as_user_updates = tk.Label(text="")
-
-        # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
-        # Also displays what the user is typing
-        def button_click():
-            def_1 = str(self.text_entry_1.get())
-            def_2 = str(self.text_entry_2.get())
-            main_dictionary[def_1] = def_2
-
-            # Show the dictionary as the user enters pairs
-            self.store_dict_values = []
-            for key in main_dictionary.items():
-                self.store_dict_values.append(key)
-
-            self.show_dictionary_as_user_updates["text"] = self.store_dict_values
-            self.show_dictionary_as_user_updates.grid(column=4, row=3)
-            print(main_dictionary)
-
-        # When the user is fully done with the program and wants to show what they got correct
-        def show_final_dictionaries():
-
-            good_pair_list = []
-            bad_pair_list = []
-
-            self.title["text"] = "What you got correct: "
-            self.title_2 = tk.Label(text="What you got wrong: ")
-            self.title_2.grid(column=3, row=4)
-
-            # Delete all of these fields
-            self.text_entry_1.grid_forget()
-            self.text_entry_2.grid_forget()
-            self.answer_response.grid_forget()
-
-            # Store everything in the good dictionary into the good list
-            for key in good_dictionary.items():
-                good_pair_list.append(key)
-
-            # Store everything in the bad dictionary into the bad list
-            for key in bad_dictionary.items():
-                bad_pair_list.append(key)
-
-            # Show the good pairs in the UI
-            self.good_dictionary_label = tk.Label(text=good_pair_list)
-            self.good_dictionary_label.grid(column=3, row=3)
-
-            # Show the bad pairs in the UI
-            self.bad_dictionary_label = tk.Label(text=bad_pair_list)
-            self.bad_dictionary_label.grid(column=3, row=5)
-
-        # Submit button
-        self.submit_button = tk.Button(master, text="Create Pair", command=button_click)
-        self.submit_button.grid(column=3, row=6)
-
-        # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
-        def quiz_click():
-            # Hides the dictionary entries
-            self.show_dictionary_as_user_updates.grid_forget()
-
-            self.submit_button["text"] = "Check Answer"
-            self.submit_button["command"] = check_answer
-
-            # TODO On click, change this button's text to next, command= next_entry
-            # Create a button for next_entry
-            self.next_entry_button = tk.Button(text="Next", command=next_entry)
-            self.next_entry_button.grid(column=4, row=6)
-
-            # Remove the quiz button from the UI
-            self.quiz_button.grid_forget()
-
-            # Done button for when user is done taking the quiz; replaces self.quiz_button
-            self.done_button = tk.Button(master, text="Done", command=show_final_dictionaries)
-            self.done_button.grid(column=3, row=7)
-
-        # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
-        # values
-        self.quiz_button = tk.Button(master, text="Quiz Me!", command=quiz_click)
-        self.quiz_button.grid(column=3, row=7)
-
         # Check if pair is in the dictionary
         def check_exist(dic, key, value):
             try:
@@ -191,8 +145,6 @@ class GUI (Frame):
                 return bool_exists
             except KeyError:
                 return False
-
-        # <----- END MAIN FUNCTIONS ----->
 
         # Function to check answer
         def check_answer():
@@ -237,6 +189,39 @@ class GUI (Frame):
                 print(bad_dictionary)
                 print("Good Dictionary:")
                 print(good_dictionary)
+
+        # When the user is fully done with the program and wants to show what they got correct
+        def show_final_dictionaries():
+
+            good_pair_list = []
+            bad_pair_list = []
+
+            self.title["text"] = "What you got correct: "
+            self.title_2 = tk.Label(text="What you got wrong: ")
+            self.title_2.grid(column=3, row=4)
+
+            # Delete all of these fields
+            self.text_entry_1.grid_forget()
+            self.text_entry_2.grid_forget()
+            self.answer_response.grid_forget()
+
+            # Store everything in the good dictionary into the good list
+            for key in good_dictionary.items():
+                good_pair_list.append(key)
+
+            # Store everything in the bad dictionary into the bad list
+            for key in bad_dictionary.items():
+                bad_pair_list.append(key)
+
+            # Show the good pairs in the UI
+            self.good_dictionary_label = tk.Label(text=good_pair_list)
+            self.good_dictionary_label.grid(column=3, row=3)
+
+            # Show the bad pairs in the UI
+            self.bad_dictionary_label = tk.Label(text=bad_pair_list)
+            self.bad_dictionary_label.grid(column=3, row=5)
+
+        # <----- END MAIN FUNCTIONS ----->
 
 
 if __name__ == "__main__":
