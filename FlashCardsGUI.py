@@ -87,15 +87,64 @@ class GUI (Frame):
                 self.store_dict_values.append(key)
 
             self.show_dictionary_as_user_updates["text"] = self.store_dict_values
-            self.show_dictionary_as_user_updates.grid(column=4, row=3)
+            self.show_dictionary_as_user_updates.grid(column=7, row=3)
             print(main_dictionary)
 
         # Submit button
         self.submit_button = tk.Button(master, text="Create Pair", command=create_pair_function)
         self.submit_button.grid(column=3, row=6)
 
+        # Global scope for edit function below
+        self.edit_label = tk.Label(text="Enter new values below")
+        self.edit_entry_1 = tk.Entry()
+        self.edit_entry_2 = tk.Entry()
+
+        def edit_function():
+            # Bind all edit objects to grid
+            self.edit_label.grid(column=4, row=3)
+            self.edit_entry_1.grid(column=4, row=4)
+            self.edit_entry_2.grid(column=4, row=5)
+
+            # Change edit_button text to Submit New Entry
+            self.edit_button["text"] = "Submit New Entry"
+
+            # Vars to store input from user in the Edit section
+            new_edit_var = str(self.edit_entry_1.get())
+            new_edit_var_2 = str(self.edit_entry_2.get())
+
+            # Replace the values
+            main_dictionary[new_edit_var] = new_edit_var_2
+
+            # Update printed dictionary in UI
+            # Show the dictionary as the user enters pairs
+            self.store_dict_values = []
+            for key in main_dictionary.items():
+                self.store_dict_values.append(key)
+
+            self.show_dictionary_as_user_updates["text"] = self.store_dict_values
+            self.show_dictionary_as_user_updates.grid(column=7, row=3)
+
+            print(main_dictionary)
+
+        self.edit_button = tk.Button(text="Edit", command=edit_function)
+        self.edit_button.grid(column=4, row=6)
+
         # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
         def quiz_click():
+            # Hide Edit button
+            self.edit_button.grid_forget()
+
+            # Hide Edit button and input
+            self.edit_button.grid_forget()
+            self.edit_label.grid_forget()
+            self.edit_entry_1.grid_forget()
+            self.edit_entry_2.grid_forget()
+
+            # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
+            # in the dictionary. This removes that null pair during the quiz.
+            if main_dictionary[""] == "":
+                del main_dictionary[""]
+
             # Hides the dictionary entries
             self.show_dictionary_as_user_updates.grid_forget()
 
@@ -192,6 +241,9 @@ class GUI (Frame):
 
         # When the user is fully done with the program and wants to show what they got correct
         def show_final_dictionaries():
+            # Hide these buttons
+            self.quiz_button.grid_forget()
+            self.submit_button.grid_forget()
 
             good_pair_list = []
             bad_pair_list = []
