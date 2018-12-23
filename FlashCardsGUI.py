@@ -13,12 +13,30 @@ class GUI (Frame):
         # TODO #1.1 If this feature is kept, problem with dictionary length
         # TODO #2. Database functionality
         # TODO #3. Add how many times the user got each pair correct; not critical & see 7
-        # TODO #4. When showing the final dictionary, remove functionality for check_answer()
-        # TODO #5. Redo GUI?
-        # TODO #6. Which definition is most right / most wrong
-        # TODO #7. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
-        # TODO #8. If user gets definition wrong twice, then show the definition
-        # TODO #9. Remove all "print()" in final build
+        # TODO #4. Redo GUI?
+        # TODO #5. Which definition is most right / most wrong
+        # TODO #6. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
+        # TODO #7. If user gets definition wrong twice, then show the definition
+        # TODO #8. Remove all "print()" in final build
+        # TODO #9. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
+
+        # <----- Global Variables ----->
+
+        # Append button, used here for scope. Used with def append_to_dictionary()
+        self.append_button = tk.Button(text="Add to existing set")
+
+        # Goes with the button_click() below, declared here for global scope
+        self.show_dictionary_as_user_updates = tk.Label(text="")
+
+        # Global scope for edit function below
+        self.edit_label = tk.Label(text="Enter new values below")
+        self.edit_entry_1 = tk.Entry()
+        self.edit_entry_2 = tk.Entry()
+
+        # Declare command, used in quiz_click()
+        self.done_button = tk.Button(master, text="", command="")
+
+        # <----- End Global Variables ----->
 
         # <-- BEGIN DICTIONARY DECLARATIONS -->
 
@@ -64,6 +82,33 @@ class GUI (Frame):
         # <-- End Entry Fields -->
 
         # <----- BEGIN MAIN FUNCTIONS ----->
+        self.main_button = tk.Button(text="Create New Deck", command="")
+        self.pre_made_button = tk.Button(text="Select From Pre-Made", command="")  # TODO Make pre-made things
+
+        # Show buttons again after the home page is clicked
+        def button_clicked_for_main_page():
+            self.title.grid(column=3, row=0)
+            self.text_entry_1.grid(column=3, row=3)
+            self.text_entry_2.grid(column=3, row=4)
+            self.submit_button.grid(column=3, row=6)
+            self.quiz_button.grid(column=3, row=7)
+            self.main_button.grid_forget()
+            self.pre_made_button.grid_forget()
+
+        # "Home page"
+        def main_page():
+            self.append_button.grid_forget()
+            self.submit_button.grid_forget()
+            self.quiz_button.grid_forget()
+            self.text_entry_1.grid_forget()
+            self.text_entry_2.grid_forget()
+            self.title.grid_forget()
+
+            self.main_button.grid(column=3, row=2)
+            self.pre_made_button.grid(column=3, row=3)
+
+            # on main_button click, run create_pair_function
+            self.main_button["command"] = button_clicked_for_main_page
 
         # Function for setting text
         def set_text(text):
@@ -71,15 +116,18 @@ class GUI (Frame):
             self.text_entry_1.insert(0, text)
             return
 
-        # Goes with the button_click() below, declared here for global scope
-        self.show_dictionary_as_user_updates = tk.Label(text="")
-
         # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
         # Also displays what the user is typing
         def create_pair_function():
+            self.append_button.grid_forget()
+
             def_1 = str(self.text_entry_1.get())
             def_2 = str(self.text_entry_2.get())
             main_dictionary[def_1] = def_2
+
+            # Solves problem if the user goes to quiz right away and doesn't need to edit. Why? I don't know but it
+            # works so don't touch it :)
+            main_dictionary[""] = ""
 
             # Show the dictionary as the user enters pairs
             self.store_dict_values = []
@@ -94,11 +142,7 @@ class GUI (Frame):
         self.submit_button = tk.Button(master, text="Create Pair", command=create_pair_function)
         self.submit_button.grid(column=3, row=6)
 
-        # Global scope for edit function below
-        self.edit_label = tk.Label(text="Enter new values below")
-        self.edit_entry_1 = tk.Entry()
-        self.edit_entry_2 = tk.Entry()
-
+        # Allows edits to be performed on the second definition only; requires the first definition (the key) to work!
         def edit_function():
             # Bind all edit objects to grid
             self.edit_label.grid(column=4, row=3)
@@ -126,24 +170,29 @@ class GUI (Frame):
 
             print(main_dictionary)
 
+        # Edit button
         self.edit_button = tk.Button(text="Edit", command=edit_function)
         self.edit_button.grid(column=4, row=6)
 
         # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
         def quiz_click():
-            # Hide Edit button
-            self.edit_button.grid_forget()
+            # Change Title header
+            self.title["text"] = "Quiz Time!"
 
             # Hide Edit button and input
+            self.edit_button.grid_forget()
             self.edit_button.grid_forget()
             self.edit_label.grid_forget()
             self.edit_entry_1.grid_forget()
             self.edit_entry_2.grid_forget()
-
+            self.append_button.grid_forget()
             # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
             # in the dictionary. This removes that null pair during the quiz.
-            if main_dictionary[""] == "":
-                del main_dictionary[""]
+            if len(main_dictionary) > 0:
+                if main_dictionary[""] == "":
+                    del main_dictionary[""]
+            else:
+                pass
 
             # Hides the dictionary entries
             self.show_dictionary_as_user_updates.grid_forget()
@@ -159,7 +208,8 @@ class GUI (Frame):
             self.quiz_button.grid_forget()
 
             # Done button for when user is done taking the quiz; replaces self.quiz_button
-            self.done_button = tk.Button(master, text="Done", command=show_final_dictionaries)
+            self.done_button["text"] = "Done"
+            self.done_button["command"] = show_final_dictionaries
             self.done_button.grid(column=3, row=7)
 
         # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
@@ -239,23 +289,35 @@ class GUI (Frame):
                 print("Good Dictionary:")
                 print(good_dictionary)
 
+        def append_to_dictionary():
+            # Attach to grid
+            self.append_button.grid(column=3, row=8)
+
+        # Home page is down here. Yeah, I know...
+        main_page()
+
+        # For scope, goes with below function
+        self.title_2 = tk.Label(text="What you got wrong: ")
+
+        # For Scope
+        self.good_dictionary_label = tk.Label(text="")
+        self.bad_dictionary_label = tk.Label(text="")
+
         # When the user is fully done with the program and wants to show what they got correct
         def show_final_dictionaries():
             # Hide these buttons
             self.quiz_button.grid_forget()
             self.submit_button.grid_forget()
+            self.text_entry_1.grid_forget()
+            self.text_entry_2.grid_forget()
+            self.answer_response.grid_forget()
+            self.edit_button.grid_forget()
 
             good_pair_list = []
             bad_pair_list = []
 
             self.title["text"] = "What you got correct: "
-            self.title_2 = tk.Label(text="What you got wrong: ")
             self.title_2.grid(column=3, row=4)
-
-            # Delete all of these fields
-            self.text_entry_1.grid_forget()
-            self.text_entry_2.grid_forget()
-            self.answer_response.grid_forget()
 
             # Store everything in the good dictionary into the good list
             for key in good_dictionary.items():
@@ -266,12 +328,15 @@ class GUI (Frame):
                 bad_pair_list.append(key)
 
             # Show the good pairs in the UI
-            self.good_dictionary_label = tk.Label(text=good_pair_list)
+            self.good_dictionary_label["text"] = good_pair_list
             self.good_dictionary_label.grid(column=3, row=3)
 
             # Show the bad pairs in the UI
-            self.bad_dictionary_label = tk.Label(text=bad_pair_list)
+            self.bad_dictionary_label["text"] = bad_pair_list
             self.bad_dictionary_label.grid(column=3, row=5)
+
+            # Show append button at the end
+            append_to_dictionary()
 
         # <----- END MAIN FUNCTIONS ----->
 
