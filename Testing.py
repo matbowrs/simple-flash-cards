@@ -1,101 +1,26 @@
 import tkinter as tk
 from tkinter import *
 from random import randint
-import sqlite3
-from sqlite3 import Error
 
 
-''' <----- DATABASE -----> '''
-
-
-def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by the db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
-
-    return None
-
-
-def select_all_tasks(conn):
-    """
-    Query all rows in the tasks table
-    :param conn: the Connection object
-    :return:
-    """
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM tasks")
-
-    rows = cur.fetchall()
-
-    for row in rows:
-        print(row)
-
-
-def select_task_by_priority(conn, priority):
-    """
-    Query tasks by priority
-    :param conn: the Connection object
-    :param priority:
-    :return:
-    """
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM tasks WHERE priority=?", (priority,))
-
-    rows = cur.fetchall()
-
-    for row in rows:
-        print(row)
-
-
-def main():
-    database = "~/PycharmProjects/simple-flash-cards/card.db"
-
-    # create a database connection
-    conn = create_connection(database)
-    with conn:
-        print("1. Query task by priority:")
-        select_task_by_priority(conn, 1)
-
-        print("2. Query all tasks")
-        select_all_tasks(conn)
-
-''' <----- END DATABASE -----> '''
-
-
-
-''' <----- GUI And Logic ----->'''
 class GUI (Frame):
 
     # Honestly no idea what this does
     def __init__(self, master=None):
 
         # TODO #1. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
-        # TODO #1.1 If this feature is kept, problem with dictionary length
 
+        # TODO #1.1 If this feature is kept, problem with dictionary length
         # TODO #2. Database functionality
-        # TODO #3. Redo GUI?
-        # TODO #4. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
-        # TODO #5. Remove all "print()" in final build
-        # TODO #6. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
-        # TODO #7. If the user enters the same deck topic, append the new definitions into the existing deck topic
+        # TODO #3. Add how many times the user got each pair correct; not critical & see 7
+        # TODO #4. Redo GUI?
+        # TODO #5. Which definition is most right / most wrong
+        # TODO #6. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
+        # TODO #7. If user gets definition wrong twice, then show the definition
+        # TODO #8. Remove all "print()" in final build
+        # TODO #9. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
 
         # <----- BEGIN GLOBAL VARIABLES ----->
-
-        # Label for deck entry
-        self.label_for_deck_topic = tk.Label(text="Create a name for your deck:")
-
-        # Entry field for deck topic
-        self.entry_for_deck_topic = tk.Entry()
-
-        # Button for creating a new topic for the deck
-        self.create_deck_topic_button = tk.Button(text="Create!", command="")
 
         # Append button, used here for scope. Used with def append_to_dictionary()
         self.append_button = tk.Button(text="Add to existing set")
@@ -110,16 +35,6 @@ class GUI (Frame):
 
         # Declare command, used in quiz_click()
         self.done_button = tk.Button(master, text="", command="")
-
-        # Globals for pre-made deck
-        # Pre-made button for when user selects pre-made decks
-        self.face_button = tk.Button(text="Parts of the Face (RUS/ENG)", command="")
-
-        # Label for pre-made
-        self.new_title = tk.Label(text="Select from  the pre-made decks below")
-
-        # Inside pre-made, review button
-        self.review_button = tk.Button(text="Review Words", command="")
 
         # <----- END GLOBAL VARIABLES ----->
 
@@ -167,35 +82,18 @@ class GUI (Frame):
         # <-- END ENTRY FIELDS -->
 
         # <----- BEGIN MAIN FUNCTIONS ----->
-        self.create_new_deck_button = tk.Button(text="Create New Deck", command="")
+        self.main_button = tk.Button(text="Create New Deck", command="")
         self.pre_made_button = tk.Button(text="Select From Pre-Made", command="")  # TODO Make pre-made things
 
-        def create_topic_for_deck():
-            self.create_new_deck_button.grid_forget()
-            self.pre_made_button.grid_forget()
-
-            self.label_for_deck_topic.grid(column=1, row=0)
-            self.entry_for_deck_topic.grid(column=1, row=1)
-            self.create_deck_topic_button.grid(column=1, row=2)
-
-            self.create_deck_topic_button["command"] = button_clicked_for_main_page
-
-        # Prompts user to enter information
+        # Show buttons again after the home page is clicked
         def button_clicked_for_main_page():
             self.title.grid(column=3, row=0)
             self.text_entry_1.grid(column=3, row=3)
             self.text_entry_2.grid(column=3, row=4)
             self.submit_button.grid(column=3, row=6)
             self.quiz_button.grid(column=3, row=7)
-
-            self.create_new_deck_button.grid_forget()
+            self.main_button.grid_forget()
             self.pre_made_button.grid_forget()
-            self.label_for_deck_topic.grid_forget()
-            self.entry_for_deck_topic.grid_forget()
-            self.create_deck_topic_button.grid_forget()
-
-            # Get the topic name from the user on button click; used for database categories
-            user_topic_entry = str(self.entry_for_deck_topic.get())
 
         # "Home page"
         def main_page():
@@ -205,13 +103,12 @@ class GUI (Frame):
             self.text_entry_1.grid_forget()
             self.text_entry_2.grid_forget()
             self.title.grid_forget()
-            self.edit_button.grid_forget()
 
-            self.create_new_deck_button.grid(column=3, row=2)
+            self.main_button.grid(column=3, row=2)
             self.pre_made_button.grid(column=3, row=3)
 
             # on main_button click, run create_pair_function
-            self.create_new_deck_button["command"] = create_topic_for_deck
+            self.main_button["command"] = button_clicked_for_main_page
 
         # Function for setting text
         def set_text(text):
@@ -442,52 +339,7 @@ class GUI (Frame):
             append_to_dictionary()
 
         # <----- END MAIN FUNCTIONS ----->
-'''
-        # Pre-made Decks
-        # Hides main homepage
-        def click_pre_made():
-            self.main_button.grid_forget()
-            self.pre_made_button.grid_forget()
-            self.edit_button.grid_forget()
-            self.new_title.grid(column=1, row=0)
-            self.face_button.grid(column=1, row=1)
 
-        # Hides buttons when passed as an argument
-        def hide_pre_made_button(name_of_button):
-            name_of_button.grid_forget()
-
-        # When clicked, run click_pre_made()
-        self.pre_made_button["command"] = click_pre_made
-
-        # Setup for showing Face deck (hiding components, changing title, etc)
-        def pre_made_face_setup():
-            hide_pre_made_button(self.face_button)
-
-            self.new_title["text"] = "Russian <-> English Parts of Face"
-
-            self.review_button = tk.Button(text="Review Words", command="")
-            self.review_button.grid(column=1, row=1)
-            self.quiz_button.grid(column=1, row=2)
-
-        self.face_button["command"] = pre_made_face_setup
-
-        dict_rus_eng_face = {
-            "лицо": "face",
-            "голова": "head",
-            "волосы": "hair",
-            "лоб": "forehead",
-            "бровь": "eyebrow",
-            "ухо": "ear",
-            "глаз": "eye",
-            "рот": "mouth",
-            "нос": "nose",
-            "шея": "neck",
-            "зубы": "teeth",
-            "подбородок": "chin"
-        }
-
-        # def pass_in_dictionary(this_dict):
-'''
 
 if __name__ == "__main__":
     guiFrame = GUI()
