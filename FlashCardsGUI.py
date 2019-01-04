@@ -6,6 +6,9 @@ from sqlite3 import Error
 
 
 ''' <----- DATABASE -----> '''
+conn = sqlite3.connect('flashcard_database.db')
+
+c = conn.cursor()
 
 
 def create_connection(db_file):
@@ -23,14 +26,14 @@ def create_connection(db_file):
     return None
 
 
-def select_all_tasks(conn):
+def select_all_cards(conn):
     """
     Query all rows in the tasks table
     :param conn: the Connection object
     :return:
     """
     cur = conn.cursor()
-    cur.execute("SELECT * FROM tasks")
+    cur.execute("SELECT * FROM cards")
 
     rows = cur.fetchall()
 
@@ -38,7 +41,7 @@ def select_all_tasks(conn):
         print(row)
 
 
-def select_task_by_priority(conn, priority):
+def select_card_by_category(conn, category):
     """
     Query tasks by priority
     :param conn: the Connection object
@@ -46,7 +49,8 @@ def select_task_by_priority(conn, priority):
     :return:
     """
     cur = conn.cursor()
-    cur.execute("SELECT * FROM tasks WHERE priority=?", (priority,))
+
+    cur.execute("SELECT * FROM cards WHERE category='" + category + "'")
 
     rows = cur.fetchall()
 
@@ -55,22 +59,27 @@ def select_task_by_priority(conn, priority):
 
 
 def main():
-    database = "~/PycharmProjects/simple-flash-cards/card.db"
+    database = "./flashcard_database.db"
 
     # create a database connection
     conn = create_connection(database)
     with conn:
         print("1. Query task by priority:")
-        select_task_by_priority(conn, 1)
+        select_card_by_category(conn, 'default')
 
         print("2. Query all tasks")
-        select_all_tasks(conn)
+        select_all_cards(conn)
+
+
+main()
+
 
 ''' <----- END DATABASE -----> '''
 
 
-
 ''' <----- GUI And Logic ----->'''
+
+
 class GUI (Frame):
 
     # Honestly no idea what this does
@@ -121,7 +130,10 @@ class GUI (Frame):
         # Inside pre-made, review button
         self.review_button = tk.Button(text="Review Words", command="")
 
-        # <----- END GLOBAL VARIABLES ----->
+        # Done button that pushes everything over to the database
+        self.done_button_to_database = tk.Button(text="Done", command="")
+
+        # <----- END GLOBAL VARIABLES -----
 
         # <-- BEGIN DICTIONARY DECLARATIONS -->
 
@@ -180,6 +192,7 @@ class GUI (Frame):
 
             self.create_deck_topic_button["command"] = button_clicked_for_main_page
 
+        user_topic_entry = ""
         # Prompts user to enter information
         def button_clicked_for_main_page():
             self.title.grid(column=3, row=0)
@@ -187,6 +200,8 @@ class GUI (Frame):
             self.text_entry_2.grid(column=3, row=4)
             self.submit_button.grid(column=3, row=6)
             self.quiz_button.grid(column=3, row=7)
+            self.edit_button.grid(column=4, row=6)
+            self.done_button_to_database.grid(column=4, row=7)
 
             self.create_new_deck_button.grid_forget()
             self.pre_made_button.grid_forget()
@@ -239,6 +254,7 @@ class GUI (Frame):
 
             self.show_dictionary_as_user_updates["text"] = self.store_dict_values
             self.show_dictionary_as_user_updates.grid(column=7, row=3)
+
             print(main_dictionary)
 
         # Submit button
@@ -441,7 +457,17 @@ class GUI (Frame):
             # Show append button at the end
             append_to_dictionary()
 
+        # When the user hits the Done button, send all pairs that are in the dictionary to the database
+        # user_topic_entry is the topic that the user entered before entering pairs
+        def send_to_database():
+            for i in main_dictionary:
+                c.execute("INSERT INTO cards VALUES ('" + i + "','" + main_dictionary[
+                    i] + "','" + user_topic_entry + "','" + "image" + "')")
+                conn.commit()
+
         # <----- END MAIN FUNCTIONS ----->
+
+
 '''
         # Pre-made Decks
         # Hides main homepage

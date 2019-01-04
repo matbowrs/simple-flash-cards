@@ -9,7 +9,7 @@ c = conn.cursor()
 c.execute("CREATE TABLE cards (firstSide text, secondSide text, category text, image text)")
 
 for i in mainDictionary:
-    c.execute("INSERT INTO cards VALUES ('" + i + "','" + mainDictionary[i] + "','" + "default" + "','" + "image" + "')" )
+    c.execute("INSERT INTO cards VALUES ('" + i + "','" + mainDictionary[i] + "','" + "default" + "','" + "image" + "')")
 
 conn.commit()
 

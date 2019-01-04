@@ -1,4 +1,5 @@
 .idea
 __pycache__
-card.db
+flashcard_database.db
 venv
+CombinatoricsCalc.py

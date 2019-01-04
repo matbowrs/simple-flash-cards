@@ -40,7 +40,7 @@ def select_card_by_category(conn, category):
     :return:
     """
     cur = conn.cursor()
-    cur.execute("SELECT * FROM cards WHERE category='default'")
+    cur.execute("SELECT * FROM cards WHERE category='" + category + "'")
 
     rows = cur.fetchall()
 
