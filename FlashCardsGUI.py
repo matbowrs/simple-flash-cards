@@ -88,12 +88,13 @@ class GUI (Frame):
         # TODO #1. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
         # TODO #1.1 If this feature is kept, problem with dictionary length
 
-        # TODO #2. Database functionality
+        # TODO #2. Database functionality * DOING *
         # TODO #3. Redo GUI?
         # TODO #4. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
         # TODO #5. Remove all "print()" in final build
         # TODO #6. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
         # TODO #7. If the user enters the same deck topic, append the new definitions into the existing deck topic
+        # TODO #8. Ask dad why new entries show up when program runs, but not in SQLite shell
 
         # <----- BEGIN GLOBAL VARIABLES ----->
 
@@ -129,9 +130,6 @@ class GUI (Frame):
 
         # Inside pre-made, review button
         self.review_button = tk.Button(text="Review Words", command="")
-
-        # Done button that pushes everything over to the database
-        self.done_button_to_database = tk.Button(text="Done", command="")
 
         # <----- END GLOBAL VARIABLES -----
 
@@ -192,7 +190,11 @@ class GUI (Frame):
 
             self.create_deck_topic_button["command"] = button_clicked_for_main_page
 
-        user_topic_entry = ""
+        # As method says; used with the category and sending data to database
+        def get_card_deck_name():
+            name = str(self.entry_for_deck_topic.get())
+            return name
+
         # Prompts user to enter information
         def button_clicked_for_main_page():
             self.title.grid(column=3, row=0)
@@ -201,7 +203,6 @@ class GUI (Frame):
             self.submit_button.grid(column=3, row=6)
             self.quiz_button.grid(column=3, row=7)
             self.edit_button.grid(column=4, row=6)
-            self.done_button_to_database.grid(column=4, row=7)
 
             self.create_new_deck_button.grid_forget()
             self.pre_made_button.grid_forget()
@@ -209,8 +210,8 @@ class GUI (Frame):
             self.entry_for_deck_topic.grid_forget()
             self.create_deck_topic_button.grid_forget()
 
-            # Get the topic name from the user on button click; used for database categories
-            user_topic_entry = str(self.entry_for_deck_topic.get())
+            # On click, get the card deck topic name
+            get_card_deck_name()
 
         # "Home page"
         def main_page():
@@ -305,6 +306,7 @@ class GUI (Frame):
             self.edit_entry_1.grid_forget()
             self.edit_entry_2.grid_forget()
             self.append_button.grid_forget()
+
             # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
             # in the dictionary. This removes that null pair during the quiz.
             if len(main_dictionary) > 0:
@@ -319,8 +321,7 @@ class GUI (Frame):
             self.submit_button["text"] = "Check Answer"
             self.submit_button["command"] = check_answer
 
-            # Create a button for next_entry
-            self.next_entry_button = tk.Button(text="Next", command=next_entry)
+            # Bind next_entry_button
             self.next_entry_button.grid(column=4, row=6)
 
             # Remove the quiz button from the UI
@@ -330,6 +331,12 @@ class GUI (Frame):
             self.done_button["text"] = "Done"
             self.done_button["command"] = show_final_dictionaries
             self.done_button.grid(column=3, row=7)
+
+            # Send to database when user clicks on Quiz Me
+            for i in main_dictionary:
+                c.execute("INSERT INTO cards VALUES ('" + i + "','" + main_dictionary[
+                    i] + "','" + get_card_deck_name() + "','" + "image" + "')")
+                conn.commit()
 
         # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
         # values
@@ -363,6 +370,9 @@ class GUI (Frame):
                 return bool_exists
             except KeyError:
                 return False
+
+        # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
+        self.next_entry_button = tk.Button(text="Next", command=next_entry)
 
         # Function to check answer
         def check_answer():
@@ -431,6 +441,7 @@ class GUI (Frame):
             self.text_entry_2.grid_forget()
             self.answer_response.grid_forget()
             self.edit_button.grid_forget()
+            self.next_entry_button.grid_forget()
 
             good_pair_list = []
             bad_pair_list = []
@@ -456,14 +467,6 @@ class GUI (Frame):
 
             # Show append button at the end
             append_to_dictionary()
-
-        # When the user hits the Done button, send all pairs that are in the dictionary to the database
-        # user_topic_entry is the topic that the user entered before entering pairs
-        def send_to_database():
-            for i in main_dictionary:
-                c.execute("INSERT INTO cards VALUES ('" + i + "','" + main_dictionary[
-                    i] + "','" + user_topic_entry + "','" + "image" + "')")
-                conn.commit()
 
         # <----- END MAIN FUNCTIONS ----->
 
