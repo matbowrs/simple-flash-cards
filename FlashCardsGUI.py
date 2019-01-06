@@ -3,6 +3,7 @@ from tkinter import *
 from random import randint
 import sqlite3
 from sqlite3 import Error
+from operator import itemgetter
 
 
 ''' <----- DATABASE -----> '''
@@ -318,24 +319,29 @@ class GUI (Frame):
             self.quiz_topic_entry.grid(column=3, row=2)
             self.quiz_topic_button.grid(column=3, row=3)
 
-        # TODO LEFT OFF HERE
         def retrieve_categories_from_database():
             user_category = str(self.quiz_topic_entry.get())
-            main_dictionary = {}
 
-            c.execute("SELECT * FROM cards WHERE category = '" + user_category + "'")
+            c.execute("SELECT firstSide, secondSide FROM cards WHERE category = '" + user_category + "'")
 
             rows = c.fetchall()
 
-            # Function works, just need to break down list row into a tuple
-            updated_dictionary = dict(t for t in zip(rows[::2], rows[1::2]))
+            # Removes the tuple pairings from "rows" and puts everything into a list of strings
+            result = []
+            for t in rows:
+                for x in t:
+                    result.append(x)
+
+            # Put everything from result[] into a dictionary
+            updated_dictionary = dict(t for t in zip(result[::2], result[1::2]))
+
+            print("updated dictionary")
             print(updated_dictionary)
 
-            print("rows!")
+            print("rows")
             print(rows)
-            print("for row in rows!")
+            print("for row in rows")
             for row in rows:
-
                 print(row)
 
         # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
