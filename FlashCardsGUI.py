@@ -94,7 +94,7 @@ class GUI (Frame):
         # TODO #5. Remove all "print()" in final build
         # TODO #6. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
         # TODO #7. If the user enters the same deck topic, append the new definitions into the existing deck topic
-        # TODO #8. Ask dad why new entries show up when program runs, but not in SQLite shell
+        # TODO #8. When user inputs which topic to study during quiz, pull correct topic from database
 
         # <----- BEGIN GLOBAL VARIABLES ----->
 
@@ -112,6 +112,11 @@ class GUI (Frame):
 
         # Goes with the button_click() below, declared here for global scope
         self.show_dictionary_as_user_updates = tk.Label(text="")
+
+        # Entry for quiz topic
+        self.quiz_topic_entry = tk.Entry()
+        # Button for quiz topic
+        self.quiz_topic_button = tk.Button(text="Submit", command="")
 
         # Global scope for edit function below
         self.edit_label = tk.Label(text="Enter new values below")
@@ -294,6 +299,45 @@ class GUI (Frame):
         self.edit_button = tk.Button(text="Edit", command=edit_function)
         self.edit_button.grid(column=4, row=6)
 
+        # Asks user for category, then retrieve the database
+        def topic_for_quiz():
+            # Hide Edit button and input
+            self.edit_button.grid_forget()
+            self.edit_button.grid_forget()
+            self.edit_label.grid_forget()
+            self.edit_entry_1.grid_forget()
+            self.edit_entry_2.grid_forget()
+            self.append_button.grid_forget()
+            self.text_entry_1.grid_forget()
+            self.text_entry_2.grid_forget()
+            self.quiz_button.grid_forget()
+            self.submit_button.grid_forget()
+
+            self.title["text"] = "Enter the topic for the quiz (the name you called the decks)"
+
+            self.quiz_topic_entry.grid(column=3, row=2)
+            self.quiz_topic_button.grid(column=3, row=3)
+
+        # TODO LEFT OFF HERE
+        def retrieve_categories_from_database():
+            user_category = str(self.quiz_topic_entry.get())
+            main_dictionary = {}
+
+            c.execute("SELECT * FROM cards WHERE category = '" + user_category + "'")
+
+            rows = c.fetchall()
+
+            # Function works, just need to break down list row into a tuple
+            updated_dictionary = dict(t for t in zip(rows[::2], rows[1::2]))
+            print(updated_dictionary)
+
+            print("rows!")
+            print(rows)
+            print("for row in rows!")
+            for row in rows:
+
+                print(row)
+
         # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
         def quiz_click():
             # Change Title header
@@ -306,6 +350,12 @@ class GUI (Frame):
             self.edit_entry_1.grid_forget()
             self.edit_entry_2.grid_forget()
             self.append_button.grid_forget()
+            self.quiz_topic_button.grid_forget()
+            self.quiz_topic_entry.grid_forget()
+
+            self.text_entry_1.grid(column=3, row=2)
+            self.text_entry_2.grid(column=3, row=3)
+            self.submit_button.grid(column=3, row=4)
 
             # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
             # in the dictionary. This removes that null pair during the quiz.
@@ -322,7 +372,7 @@ class GUI (Frame):
             self.submit_button["command"] = check_answer
 
             # Bind next_entry_button
-            self.next_entry_button.grid(column=4, row=6)
+            self.next_entry_button.grid(column=4, row=4)
 
             # Remove the quiz button from the UI
             self.quiz_button.grid_forget()
@@ -330,7 +380,7 @@ class GUI (Frame):
             # Done button for when user is done taking the quiz; replaces self.quiz_button
             self.done_button["text"] = "Done"
             self.done_button["command"] = show_final_dictionaries
-            self.done_button.grid(column=3, row=7)
+            self.done_button.grid(column=3, row=5)
 
             # Send to database when user clicks on Quiz Me
             for i in main_dictionary:
@@ -338,9 +388,13 @@ class GUI (Frame):
                     i] + "','" + get_card_deck_name() + "','" + "image" + "')")
                 conn.commit()
 
+            retrieve_categories_from_database()
+
+        self.quiz_topic_button["command"] = quiz_click
+
         # Quiz Button for when the user is ready to stop entering values and is ready for a quiz of dictionary
         # values
-        self.quiz_button = tk.Button(master, text="Quiz Me!", command=quiz_click)
+        self.quiz_button = tk.Button(master, text="Quiz Me!", command=topic_for_quiz)
         self.quiz_button.grid(column=3, row=7)
 
         # When you hit the Next button, this function is called and displays next value; comes during quiz
