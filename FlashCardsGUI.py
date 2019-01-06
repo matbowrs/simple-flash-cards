@@ -3,7 +3,6 @@ from tkinter import *
 from random import randint
 import sqlite3
 from sqlite3 import Error
-from operator import itemgetter
 
 
 ''' <----- DATABASE -----> '''
@@ -38,8 +37,9 @@ def select_all_cards(conn):
 
     rows = cur.fetchall()
 
-    for row in rows:
+    ''' for row in rows:
         print(row)
+    '''
 
 
 def select_card_by_category(conn, category):
@@ -55,8 +55,9 @@ def select_card_by_category(conn, category):
 
     rows = cur.fetchall()
 
-    for row in rows:
-        print(row)
+    ''' for row in rows:
+        print(row) 
+    '''
 
 
 def main():
@@ -65,10 +66,8 @@ def main():
     # create a database connection
     conn = create_connection(database)
     with conn:
-        print("1. Query task by priority:")
         select_card_by_category(conn, 'default')
 
-        print("2. Query all tasks")
         select_all_cards(conn)
 
 
@@ -95,8 +94,11 @@ class GUI (Frame):
         # TODO #5. Remove all "print()" in final build
         # TODO #6. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
         # TODO #7. If the user enters the same deck topic, append the new definitions into the existing deck topic
-        # TODO #8. When user inputs which topic to study during quiz, pull correct topic from database
 
+        # <------- HIGH PRIORITY ------->
+        # TODO #8. Fix issue where when the user wants to take a quiz from a previous session, answers do not
+        # TODO CONT. sync properly. If the user enters pairs and quizzes on said pairs immediately, it works perfectly.
+        # TODO #9. Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
         # <----- BEGIN GLOBAL VARIABLES ----->
 
         # Label for deck entry
@@ -144,6 +146,9 @@ class GUI (Frame):
         # Declare main dictionary
         main_dictionary = {}
 
+        # Declare updated dictionary that is used with specified category quizzes
+        updated_dictionary = {}
+
         # If user gets definition wrong, pair is sent here
         bad_dictionary = {}
 
@@ -171,7 +176,7 @@ class GUI (Frame):
 
         # Label for showing whether the answer was correct or not
         self.answer_response = tk.Label(text="")
-        self.answer_response.grid(column=3, row=5)
+        self.answer_response.grid(column=3, row=6)
         # <--- END LABELS --->
 
         # <-- BEGIN ENTRY FIELDS -->
@@ -335,14 +340,26 @@ class GUI (Frame):
             # Put everything from result[] into a dictionary
             updated_dictionary = dict(t for t in zip(result[::2], result[1::2]))
 
-            print("updated dictionary")
-            print(updated_dictionary)
+            print("pairs in category => %s" % updated_dictionary)
 
-            print("rows")
-            print(rows)
-            print("for row in rows")
-            for row in rows:
-                print(row)
+            # Quiz section, kept here for scope reasons
+            list_of_keys = []
+            my_list = []
+
+            for x in updated_dictionary:
+                my_list.append(x)
+
+            list_of_keys.append(self.text_entry_1.get())
+
+            # Used for selection when choosing a value for quizzing the user
+            rand_num = randint(0, len(updated_dictionary) - 1)
+
+            # If the last entry and the new entry-to-be are the same, make the new entry-to-be different
+            while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
+                rand_num = randint(0, len(updated_dictionary) - 1)
+
+            set_text(my_list[rand_num])
+            print(my_list[rand_num])
 
         # When the user is ready to quiz him/herself, change the button text on "self.submit_button" to "Check Answer"
         def quiz_click():
@@ -403,26 +420,6 @@ class GUI (Frame):
         self.quiz_button = tk.Button(master, text="Quiz Me!", command=topic_for_quiz)
         self.quiz_button.grid(column=3, row=7)
 
-        # When you hit the Next button, this function is called and displays next value; comes during quiz
-        def next_entry():
-            list_of_keys = []
-            my_list = []
-
-            for x in main_dictionary:
-                my_list.append(x)
-
-            list_of_keys.append(self.text_entry_1.get())
-
-            # Used for selection when choosing a value for quizzing the user
-            rand_num = randint(0, len(main_dictionary) - 1)
-
-            # If the last entry and the new entry-to-be are the same, make the new entry-to-be different
-            while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
-                rand_num = randint(0, len(main_dictionary) - 1)
-
-            set_text(my_list[rand_num])
-            print(my_list[rand_num])
-
         # Check if pair is in the dictionary
         def check_exist(dic, key, value):
             try:
@@ -432,9 +429,10 @@ class GUI (Frame):
                 return False
 
         # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
-        self.next_entry_button = tk.Button(text="Next", command=next_entry)
+        self.next_entry_button = tk.Button(text="Next", command=retrieve_categories_from_database)
 
         # Function to check answer
+        # TODO Need to be able to check other values
         def check_answer():
             key_answer = str(self.text_entry_1.get())  # Get input from text_entry_1
             user_answer = str(self.text_entry_2.get())  # Get input from text_entry_2
