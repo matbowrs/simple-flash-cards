@@ -318,6 +318,7 @@ class GUI (Frame):
             self.text_entry_2.grid_forget()
             self.quiz_button.grid_forget()
             self.submit_button.grid_forget()
+            self.show_dictionary_as_user_updates.grid_forget()
 
             self.title["text"] = "Enter the topic for the quiz (the name you called the decks)"
 
@@ -358,6 +359,8 @@ class GUI (Frame):
             while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
                 rand_num = randint(0, len(updated_dictionary) - 1)
 
+            self.submit_button["command"] = lambda: check_answer(updated_dictionary)
+
             set_text(my_list[rand_num])
             print(my_list[rand_num])
 
@@ -392,7 +395,6 @@ class GUI (Frame):
             self.show_dictionary_as_user_updates.grid_forget()
 
             self.submit_button["text"] = "Check Answer"
-            self.submit_button["command"] = check_answer
 
             # Bind next_entry_button
             self.next_entry_button.grid(column=4, row=4)
@@ -432,13 +434,12 @@ class GUI (Frame):
         self.next_entry_button = tk.Button(text="Next", command=retrieve_categories_from_database)
 
         # Function to check answer
-        # TODO Need to be able to check other values
-        def check_answer():
+        # Function that takes a dictionary as an argument
+        def check_answer(x):
             key_answer = str(self.text_entry_1.get())  # Get input from text_entry_1
             user_answer = str(self.text_entry_2.get())  # Get input from text_entry_2
 
-            does_pair_exist_bool = check_exist(main_dictionary, key_answer, user_answer)
-
+            does_pair_exist_bool = check_exist(x, key_answer, user_answer)
             # Check if the user_answer and key_answer are paired together in the dictionary
             if does_pair_exist_bool:
                 self.answer_response["text"] = "Correct!"
@@ -455,10 +456,10 @@ class GUI (Frame):
                 print(bad_dictionary)
             else:
                 self.answer_response["text"] = "Wrong!"
-                for i in main_dictionary:
+                for i in x:
                     if i == key_answer:
                         # Matches the correct words together and stores it in the bad_dictionary{}
-                        bad_dictionary[main_dictionary[i]] = key_answer
+                        bad_dictionary[x[i]] = key_answer
                         print("Bad Dictionary:")
                         print(bad_dictionary)
                         print("Good Dictionary:")
