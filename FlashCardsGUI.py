@@ -88,17 +88,15 @@ class GUI (Frame):
         # TODO #1. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
         # TODO #1.1 If this feature is kept, problem with dictionary length
 
-        # TODO #2. Database functionality * DOING *
-        # TODO #3. Redo GUI?
-        # TODO #4. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
-        # TODO #5. Remove all "print()" in final build
-        # TODO #6. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
-        # TODO #7. If the user enters the same deck topic, append the new definitions into the existing deck topic
+        # TODO #2. Redo GUI?
+        # TODO #3. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
+        # TODO #4. Remove all "print()" in final build
+        # TODO #5. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
+        # TODO #6. If the user enters the same deck topic, append the new definitions into the existing deck topic
 
         # <------- HIGH PRIORITY ------->
-        # TODO #8. Fix issue where when the user wants to take a quiz from a previous session, answers do not
-        # TODO CONT. sync properly. If the user enters pairs and quizzes on said pairs immediately, it works perfectly.
-        # TODO #9. Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
+        # TODO #7. Show all topics that are in the database so the user can properly select which topic they want
+        # TODO #8. Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
         # <----- BEGIN GLOBAL VARIABLES ----->
 
         # Label for deck entry
