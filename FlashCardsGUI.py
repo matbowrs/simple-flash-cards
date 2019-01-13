@@ -26,6 +26,10 @@ def create_connection(db_file):
     return None
 
 
+def delete_category_entry():
+    c.execute("DELETE FROM cards WHERE category = '' OR category = 'cows' OR category = 'hey smile'")
+
+
 def select_all_cards(conn):
     """
     Query all rows in the tasks table
@@ -69,6 +73,8 @@ def main():
         select_card_by_category(conn, 'default')
 
         select_all_cards(conn)
+
+    delete_category_entry()
 
 
 main()
@@ -119,6 +125,12 @@ class GUI (Frame):
         # Button for quiz topic
         self.quiz_topic_button = tk.Button(text="Submit", command="")
 
+        # ListBox for showing all available categories the user can select from the database
+        lb = Listbox()
+
+        # Show which category the quiz is on ?? Delete ??
+        self.category_quiz_label = tk.Label(text="Category Name Here")
+
         # Global scope for edit function below
         self.edit_label = tk.Label(text="Enter new values below")
         self.edit_entry_1 = tk.Entry()
@@ -143,9 +155,6 @@ class GUI (Frame):
 
         # Declare main dictionary
         main_dictionary = {}
-
-        # Declare updated dictionary that is used with specified category quizzes
-        updated_dictionary = {}
 
         # If user gets definition wrong, pair is sent here
         bad_dictionary = {}
@@ -318,13 +327,28 @@ class GUI (Frame):
             self.submit_button.grid_forget()
             self.show_dictionary_as_user_updates.grid_forget()
 
-            self.title["text"] = "Enter the topic for the quiz (the name you called the decks)"
-
             self.quiz_topic_entry.grid(column=3, row=2)
             self.quiz_topic_button.grid(column=3, row=3)
 
-        def retrieve_categories_from_database():
+            self.title["text"] = "Enter the topic for the quiz (the name you called the decks)"
+
+            retrieve_all_available_categories()
+
+        def retrieve_all_available_categories():
+            c.execute("SELECT DISTINCT category FROM cards")
+            all_categories = c.fetchall()
+
+            lb.grid(column=3, row=4)
+
+            for i in all_categories:
+                lb.insert(END, i)
+
+        def retrieve_category_pairs_from_database():
+            # Get which category the user typed in
             user_category = str(self.quiz_topic_entry.get())
+
+            # Set user category equal to the label that is to be used during the quiz
+            self.category_quiz_label["text"] = user_category
 
             c.execute("SELECT firstSide, secondSide FROM cards WHERE category = '" + user_category + "'")
 
@@ -376,6 +400,7 @@ class GUI (Frame):
             self.append_button.grid_forget()
             self.quiz_topic_button.grid_forget()
             self.quiz_topic_entry.grid_forget()
+            lb.grid_forget()
 
             self.text_entry_1.grid(column=3, row=2)
             self.text_entry_2.grid(column=3, row=3)
@@ -411,7 +436,7 @@ class GUI (Frame):
                     i] + "','" + get_card_deck_name() + "','" + "image" + "')")
                 conn.commit()
 
-            retrieve_categories_from_database()
+            retrieve_category_pairs_from_database()
 
         self.quiz_topic_button["command"] = quiz_click
 
@@ -429,7 +454,7 @@ class GUI (Frame):
                 return False
 
         # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
-        self.next_entry_button = tk.Button(text="Next", command=retrieve_categories_from_database)
+        self.next_entry_button = tk.Button(text="Next", command=retrieve_category_pairs_from_database)
 
         # Function to check answer
         # Function that takes a dictionary as an argument
