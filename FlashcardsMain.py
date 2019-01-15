@@ -85,15 +85,13 @@ main()
 # TODO #1. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
 # TODO #1.1 If this feature is kept, problem with dictionary length
 
-# TODO #2. Redo GUI?
-# TODO #3. Remove all "print()" in final build
-# TODO #4. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
+# TODO #2. Remove all "print()" in final build
+# TODO #3. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
 
 # <------- HIGH PRIORITY ------->
-# TODO #5. "Learn" button at the home page
-# TODO #6. After user enters pairs, instead of quizzing right away, let the user learn them
-# TODO #7.  Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
-
+# TODO #4. "Learn" button at the home page
+# TODO #5. After user enters pairs, instead of quizzing right away, let the user learn them
+# TODO #6. Allow the user to upload pictures
 
 # ----- GUI -----
 window = tk.Tk()
@@ -194,10 +192,11 @@ pre_made_button = tk.Button(text="Select From Pre-Made", command="")  # TODO Mak
 def create_topic_for_deck():
     create_new_deck_button.grid_forget()
     pre_made_button.grid_forget()
+    learn_button.grid_forget()
 
     label_for_deck_topic.grid(column=6, row=0, padx=250, pady=(125, 5))
     entry_for_deck_topic.grid(column=6, row=1, padx=250)
-    create_deck_topic_button.grid(column=6, row=2, padx=250)
+    create_deck_topic_button.grid(column=6, row=4, padx=250)
 
     create_deck_topic_button["command"] = button_clicked_for_main_page
 
@@ -280,6 +279,7 @@ def create_pair_function():
     show_dictionary_as_user_updates["text"] = store_dict_values
     show_dictionary_as_user_updates.grid(column=7, row=3)
 
+    # TODO : Fix problem with duplicates
     # Use list to show items in ListBox as user enters information
     for i in store_dict_values:
         lb_as_user_updates.insert(END, i)
@@ -293,9 +293,17 @@ def create_pair_function():
 submit_button = tk.Button(text="Create Pair", command=create_pair_function)
 submit_button.grid(column=6, row=6, padx=250)
 
+# TODO : Show both pairs instead of just 1 (like the quiz)
+
+
 def learn_get_pairs():
     entry_for_deck_topic.grid_forget()
     title["text"] = "Let's learn"
+
+    local_dictionary = retrieve_category_pairs_from_database()
+
+    text_entry_2['text'] = local_dictionary.keys()
+    print(local_dictionary)
 
 
 def learn_function():
@@ -307,6 +315,7 @@ def learn_function():
     submit_button['command'] = ''
     # next_entry_button.grid(column=6, row=7, padx=250)
     topic_for_quiz()
+    # learn_get_pairs()
 
 
 learn_button['command'] = learn_function
@@ -380,10 +389,12 @@ def retrieve_all_available_categories():
         lb.insert(END, i)
 
 
-def data_into_dictionary(x):
+# Convert list into a dictionary
+def list_to_dictionary(my_list):
     # Where x is a list
-    updated_dictionary = dict(t for t in zip(x[::2], x[1::2]))
+    updated_dictionary = dict(t for t in zip(my_list[::2], my_list[1::2]))
     return updated_dictionary
+
 
 def retrieve_category_pairs_from_database():
     # Get which category the user typed in
@@ -403,16 +414,20 @@ def retrieve_category_pairs_from_database():
             result.append(x)
 
     # Put everything from result[] into a dictionary
-    updated_dictionary = data_into_dictionary(result)
+    updated_dictionary = list_to_dictionary(result)
 
     # Logic for the quiz section, pass in the updated_dictionary
-    quiz_section(updated_dictionary)
+    quiz_next_pair(updated_dictionary)
 
     print("pairs in category => %s" % updated_dictionary)
 
+    return updated_dictionary
 
-def quiz_section(a_dictionary):
-    # Quiz section, kept here for scope reasons
+
+def quiz_next_pair(a_dictionary):
+    # Quiz section
+    lb_as_user_updates.grid_forget()
+
     list_of_keys = []
     my_list = []
 
@@ -457,11 +472,11 @@ def quiz_click():
 
     # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
     # in the dictionary. This removes that null pair during the quiz.
-    if len(main_dictionary) > 0:
+    '''if len(main_dictionary) > 0:
         if main_dictionary[""] == "":
             del main_dictionary[""]
     else:
-        pass
+        pass'''
 
     # Hides the dictionary entries
     show_dictionary_as_user_updates.grid_forget()
