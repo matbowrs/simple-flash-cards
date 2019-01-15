@@ -293,11 +293,9 @@ def create_pair_function():
 submit_button = tk.Button(text="Create Pair", command=create_pair_function)
 submit_button.grid(column=6, row=6, padx=250)
 
-'''def learn_get_pairs():
+def learn_get_pairs():
     entry_for_deck_topic.grid_forget()
     title["text"] = "Let's learn"
-    set_text()
-    '''
 
 
 def learn_function():
@@ -382,6 +380,11 @@ def retrieve_all_available_categories():
         lb.insert(END, i)
 
 
+def data_into_dictionary(x):
+    # Where x is a list
+    updated_dictionary = dict(t for t in zip(x[::2], x[1::2]))
+    return updated_dictionary
+
 def retrieve_category_pairs_from_database():
     # Get which category the user typed in
     user_category = str(quiz_topic_entry.get())
@@ -400,27 +403,32 @@ def retrieve_category_pairs_from_database():
             result.append(x)
 
     # Put everything from result[] into a dictionary
-    updated_dictionary = dict(t for t in zip(result[::2], result[1::2]))
+    updated_dictionary = data_into_dictionary(result)
+
+    # Logic for the quiz section, pass in the updated_dictionary
+    quiz_section(updated_dictionary)
 
     print("pairs in category => %s" % updated_dictionary)
 
+
+def quiz_section(a_dictionary):
     # Quiz section, kept here for scope reasons
     list_of_keys = []
     my_list = []
 
-    for x in updated_dictionary:
+    for x in a_dictionary:
         my_list.append(x)
 
     list_of_keys.append(text_entry_1.get())
 
     # Used for selection when choosing a value for quizzing the user
-    rand_num = randint(0, len(updated_dictionary) - 1)
+    rand_num = randint(0, len(a_dictionary) - 1)
 
     # If the last entry and the new entry-to-be are the same, make the new entry-to-be different
     while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
-        rand_num = randint(0, len(updated_dictionary) - 1)
+        rand_num = randint(0, len(a_dictionary) - 1)
 
-    submit_button["command"] = lambda: check_answer(updated_dictionary)
+    submit_button["command"] = lambda: check_answer(a_dictionary)
 
     set_text(my_list[rand_num])
     print(my_list[rand_num])
