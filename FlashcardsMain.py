@@ -86,14 +86,13 @@ main()
 # TODO #1.1 If this feature is kept, problem with dictionary length
 
 # TODO #2. Redo GUI?
-# TODO #3. When user is fully done, add buttons to enter new definitions, edit definitions and quiz again
-# TODO #4. Remove all "print()" in final build
-# TODO #5. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
-# TODO #6. If the user enters the same deck topic, append the new definitions into the existing deck topic
+# TODO #3. Remove all "print()" in final build
+# TODO #4. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
 
 # <------- HIGH PRIORITY ------->
-# TODO #7. Show all topics that are in the database so the user can properly select which topic they want
-# TODO #8. Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
+# TODO #5. "Learn" button at the home page
+# TODO #6. After user enters pairs, instead of quizzing right away, let the user learn them
+# TODO #7.  Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
 
 
 # ----- GUI -----
@@ -129,6 +128,7 @@ quiz_topic_button = tk.Button(text="Submit", command="")
 
 # ListBox for showing all available categories the user can select from the database
 lb = Listbox()
+lb_as_user_updates = Listbox()
 
 # Show which category the quiz is on ?? Delete ??
 category_quiz_label = tk.Label(text="Category Name Here")
@@ -137,6 +137,9 @@ category_quiz_label = tk.Label(text="Category Name Here")
 edit_label = tk.Label(text="Enter new values below")
 edit_entry_1 = tk.Entry()
 edit_entry_2 = tk.Entry()
+
+# Learn button
+learn_button = tk.Button(text="Learn Topic", command="")
 
 # Declare command, used in quiz_click()
 done_button = tk.Button(text="", command="")
@@ -213,6 +216,7 @@ def button_clicked_for_main_page():
     submit_button.grid(column=6, row=6, padx=175)
     quiz_button.grid(column=6, row=7, padx=175)
     edit_button.grid(column=7, row=6, padx=175)
+    learn_button.grid(column=6, row=8, padx=175)
 
     create_new_deck_button.grid_forget()
     pre_made_button.grid_forget()
@@ -235,7 +239,8 @@ def main_page():
     edit_button.grid_forget()
 
     create_new_deck_button.grid(column=6, row=4, padx=250, pady=(125, 10))
-    pre_made_button.grid(column=6, row=5, padx=250)
+    learn_button.grid(column=6, row=5, padx=250)
+    pre_made_button.grid(column=6, row=6, padx=250)
 
     # on main_button click, run create_pair_function
     create_new_deck_button["command"] = create_topic_for_deck
@@ -263,11 +268,23 @@ def create_pair_function():
 
     # Show the dictionary as the user enters pairs
     store_dict_values = []
+
+    # Remove any blank pairs
+    if '' in main_dictionary:
+        del main_dictionary['']
+
+    # Append dictionary pairs to list
     for key in main_dictionary.items():
         store_dict_values.append(key)
 
     show_dictionary_as_user_updates["text"] = store_dict_values
     show_dictionary_as_user_updates.grid(column=7, row=3)
+
+    # Use list to show items in ListBox as user enters information
+    for i in store_dict_values:
+        lb_as_user_updates.insert(END, i)
+
+    lb_as_user_updates.grid(column=6, row=9)
 
     print(main_dictionary)
 
@@ -275,6 +292,26 @@ def create_pair_function():
 # Submit button
 submit_button = tk.Button(text="Create Pair", command=create_pair_function)
 submit_button.grid(column=6, row=6, padx=250)
+
+'''def learn_get_pairs():
+    entry_for_deck_topic.grid_forget()
+    title["text"] = "Let's learn"
+    set_text()
+    '''
+
+
+def learn_function():
+    create_new_deck_button.grid_forget()
+    pre_made_button.grid_forget()
+    text_entry_1.grid(column=6, row=4, padx=250, pady=50)
+    text_entry_2.grid(column=6, row=5, padx=250)
+    submit_button.grid(column=6, row=6, padx=250)
+    submit_button['command'] = ''
+    # next_entry_button.grid(column=6, row=7, padx=250)
+    topic_for_quiz()
+
+
+learn_button['command'] = learn_function
 
 
 # Allows edits to be performed on the second definition only; requires the first definition (the key) to work!
@@ -325,6 +362,7 @@ def topic_for_quiz():
     quiz_button.grid_forget()
     submit_button.grid_forget()
     show_dictionary_as_user_updates.grid_forget()
+    learn_button.grid_forget()
 
     quiz_topic_entry.grid(column=6, row=2, padx=250, pady=(5, 0))
     quiz_topic_button.grid(column=6, row=3, padx=250)
@@ -403,6 +441,7 @@ def quiz_click():
     quiz_topic_button.grid_forget()
     quiz_topic_entry.grid_forget()
     lb.grid_forget()
+    learn_button.grid_forget()
 
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
@@ -533,6 +572,7 @@ def show_final_dictionaries():
     answer_response.grid_forget()
     edit_button.grid_forget()
     next_entry_button.grid_forget()
+    learn_button.grid_forget()
 
     good_pair_list = []
     bad_pair_list = []
