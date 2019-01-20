@@ -296,24 +296,14 @@ submit_button.grid(column=6, row=6, padx=250)
 # TODO : Show both pairs instead of just 1 (like the quiz)
 
 
-def learn_get_pairs():
-    entry_for_deck_topic.grid_forget()
-    title["text"] = "Let's learn"
-
-    local_dictionary = retrieve_category_pairs_from_database()
-
-    text_entry_2['text'] = local_dictionary.keys()
-    print(local_dictionary)
-
-
 def learn_function():
     create_new_deck_button.grid_forget()
     pre_made_button.grid_forget()
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=6, padx=250)
-    submit_button['command'] = ''
-    # next_entry_button.grid(column=6, row=7, padx=250)
+    submit_button['command'] = quiz_click
+    # Getting topic for the quiz
     topic_for_quiz()
     # learn_get_pairs()
 
@@ -374,7 +364,7 @@ def topic_for_quiz():
     quiz_topic_entry.grid(column=6, row=2, padx=250, pady=(5, 0))
     quiz_topic_button.grid(column=6, row=3, padx=250)
 
-    title["text"] = "Enter the topic for the quiz (the name you called the decks)"
+    title["text"] = "Enter the topic you would like to learn / quiz over"
     title.grid(column=6, row=0, padx=150)
     retrieve_all_available_categories()
 
