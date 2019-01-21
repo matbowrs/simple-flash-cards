@@ -186,12 +186,10 @@ text_entry_2.grid(column=6, row=8, padx=250)
 
 # <----- BEGIN MAIN FUNCTIONS ----->
 create_new_deck_button = tk.Button(text="Create New Deck", command="")
-pre_made_button = tk.Button(text="Select From Pre-Made", command="")  # TODO Make pre-made things
 
 
 def create_topic_for_deck():
     create_new_deck_button.grid_forget()
-    pre_made_button.grid_forget()
     learn_button.grid_forget()
 
     label_for_deck_topic.grid(column=6, row=0, padx=250, pady=(125, 5))
@@ -218,7 +216,6 @@ def button_clicked_for_main_page():
     learn_button.grid(column=6, row=8, padx=175)
 
     create_new_deck_button.grid_forget()
-    pre_made_button.grid_forget()
     label_for_deck_topic.grid_forget()
     entry_for_deck_topic.grid_forget()
     create_deck_topic_button.grid_forget()
@@ -239,7 +236,6 @@ def main_page():
 
     create_new_deck_button.grid(column=6, row=4, padx=250, pady=(125, 10))
     learn_button.grid(column=6, row=5, padx=250)
-    pre_made_button.grid(column=6, row=6, padx=250)
 
     # on main_button click, run create_pair_function
     create_new_deck_button["command"] = create_topic_for_deck
@@ -249,6 +245,12 @@ def main_page():
 def set_text(text):
     text_entry_1.delete(0, END)
     text_entry_1.insert(0, text)
+    return
+
+
+def set_text_2(text):
+    text_entry_2.delete(0, END)
+    text_entry_2.insert(0, text)
     return
 
 
@@ -298,7 +300,6 @@ submit_button.grid(column=6, row=6, padx=250)
 
 def learn_function():
     create_new_deck_button.grid_forget()
-    pre_made_button.grid_forget()
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=6, padx=250)
@@ -369,6 +370,7 @@ def topic_for_quiz():
     retrieve_all_available_categories()
 
 
+# Retrieving all categories and storing them in a listbox
 def retrieve_all_available_categories():
     c.execute("SELECT DISTINCT category FROM cards")
     all_categories = c.fetchall()
@@ -386,6 +388,7 @@ def list_to_dictionary(my_list):
     return updated_dictionary
 
 
+# Get the user inputted category from the database, store it in a list
 def retrieve_category_pairs_from_database():
     # Get which category the user typed in
     user_category = str(quiz_topic_entry.get())
@@ -414,6 +417,7 @@ def retrieve_category_pairs_from_database():
     return updated_dictionary
 
 
+# Get the next pair during the quiz section
 def quiz_next_pair(a_dictionary):
     # Quiz section
     lb_as_user_updates.grid_forget()
@@ -433,6 +437,7 @@ def quiz_next_pair(a_dictionary):
     while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
         rand_num = randint(0, len(a_dictionary) - 1)
 
+    # Checks if the answer is correct
     submit_button["command"] = lambda: check_answer(a_dictionary)
 
     set_text(my_list[rand_num])
@@ -615,54 +620,6 @@ def show_final_dictionaries():
     append_to_dictionary()
 
 # <----- END MAIN FUNCTIONS ----->
-
-
-'''
-        # Pre-made Decks
-        # Hides main homepage
-        def click_pre_made():
-            .main_button.grid_forget()
-            .pre_made_button.grid_forget()
-            .edit_button.grid_forget()
-            .new_title.grid(column=1, row=0)
-            .face_button.grid(column=1, row=1)
-
-        # Hides buttons when passed as an argument
-        def hide_pre_made_button(name_of_button):
-            name_of_button.grid_forget()
-
-        # When clicked, run click_pre_made()
-        .pre_made_button["command"] = click_pre_made
-
-        # Setup for showing Face deck (hiding components, changing title, etc)
-        def pre_made_face_setup():
-            hide_pre_made_button(.face_button)
-
-            .new_title["text"] = "Russian <-> English Parts of Face"
-
-            .review_button = tk.Button(text="Review Words", command="")
-            .review_button.grid(column=1, row=1)
-            .quiz_button.grid(column=1, row=2)
-
-        .face_button["command"] = pre_made_face_setup
-
-        dict_rus_eng_face = {
-            "лицо": "face",
-            "голова": "head",
-            "волосы": "hair",
-            "лоб": "forehead",
-            "бровь": "eyebrow",
-            "ухо": "ear",
-            "глаз": "eye",
-            "рот": "mouth",
-            "нос": "nose",
-            "шея": "neck",
-            "зубы": "teeth",
-            "подбородок": "chin"
-        }
-
-        # def pass_in_dictionary(this_dict):
-'''
 
 if __name__ == "__main__":
     window.mainloop()
