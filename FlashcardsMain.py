@@ -26,7 +26,7 @@ def create_connection(db_file):
 
 
 def delete_category_entry():
-    c.execute("DELETE FROM cards WHERE category = '' OR category = 'cows' OR category = 'hey smile'")
+    c.execute("DELETE FROM cards WHERE category = '' OR category = 'test' OR category = 'Test'")
 
 
 def select_all_cards(conn):
@@ -142,6 +142,9 @@ learn_button = tk.Button(text="Learn Topic", command="")
 # Declare command, used in quiz_click()
 done_button = tk.Button(text="", command="")
 
+# Submit button
+submit_button = tk.Button(text="Create Pair", command='')
+
 # Globals for pre-made deck
 # Pre-made button for when user selects pre-made decks
 face_button = tk.Button(text="Parts of the Face (RUS/ENG)", command="")
@@ -255,6 +258,47 @@ def set_text_2(text):
     return
 
 
+# Allows edits to be performed on the second definition only; requires the first definition (the key) to work!
+def edit_function():
+    # Bind all edit objects to grid
+    edit_label.grid(column=4, row=3)
+    edit_entry_1.grid(column=4, row=4)
+    edit_entry_2.grid(column=4, row=5)
+
+    # Change edit_button text to Submit New Entry
+    edit_button["text"] = "Submit New Entry"
+
+    # Vars to store input from user in the Edit section
+    new_edit_var = str(edit_entry_1.get())
+    new_edit_var_2 = str(edit_entry_2.get())
+
+    # Replace the values
+    main_dictionary[new_edit_var] = new_edit_var_2
+
+    # Update printed dictionary in UI
+    # Show the dictionary as the user enters pairs
+    store_dict_values = []
+    for key in main_dictionary.items():
+        store_dict_values.append(key)
+
+    show_dictionary_as_user_updates["text"] = store_dict_values
+    show_dictionary_as_user_updates.grid(column=7, row=3)
+
+    print(main_dictionary)
+
+
+# Edit button
+edit_button = tk.Button(text="Edit", command=edit_function)
+edit_button.grid(column=7, row=6)
+
+
+# Convert list into a dictionary
+def list_to_dictionary(my_list):
+    # Where x is a list
+    updated_dictionary = dict(t for t in zip(my_list[::2], my_list[1::2]))
+    return updated_dictionary
+
+
 # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
 # Also displays what the user is typing
 def create_pair_function():
@@ -293,7 +337,7 @@ def create_pair_function():
 
 
 # Submit button
-submit_button = tk.Button(text="Create Pair", command=create_pair_function)
+submit_button['command'] = create_pair_function
 submit_button.grid(column=6, row=6, padx=250)
 
 # TODO : Show both pairs instead of just 1 (like the quiz)
@@ -326,6 +370,7 @@ def learn_get_pairs():
     return updated_dictionary '''
 
 
+<<<<<<< HEAD
 def learn_function():
     create_new_deck_button.grid_forget()
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
@@ -355,25 +400,11 @@ def edit_function():
     # Vars to store input from user in the Edit section
     new_edit_var = str(edit_entry_1.get())
     new_edit_var_2 = str(edit_entry_2.get())
+=======
+# <----- LEARNING SECTION ----->
+>>>>>>> learning
 
-    # Replace the values
-    main_dictionary[new_edit_var] = new_edit_var_2
-
-    # Update printed dictionary in UI
-    # Show the dictionary as the user enters pairs
-    store_dict_values = []
-    for key in main_dictionary.items():
-        store_dict_values.append(key)
-
-    show_dictionary_as_user_updates["text"] = store_dict_values
-    show_dictionary_as_user_updates.grid(column=7, row=3)
-
-    print(main_dictionary)
-
-
-# Edit button
-edit_button = tk.Button(text="Edit", command=edit_function)
-edit_button.grid(column=7, row=6)
+# <----- END LEARNING SECTION ----->
 
 
 # Asks user for category, then retrieve the database
@@ -391,6 +422,7 @@ def topic_for_quiz():
     submit_button.grid_forget()
     show_dictionary_as_user_updates.grid_forget()
     learn_button.grid_forget()
+    lb_as_user_updates.grid_forget()
 
     quiz_topic_entry.grid(column=6, row=2, padx=250, pady=(5, 0))
     quiz_topic_button.grid(column=6, row=3, padx=250)
@@ -409,13 +441,6 @@ def retrieve_all_available_categories():
 
     for i in all_categories:
         lb.insert(END, i)
-
-
-# Convert list into a dictionary
-def list_to_dictionary(my_list):
-    # Where x is a list
-    updated_dictionary = dict(t for t in zip(my_list[::2], my_list[1::2]))
-    return updated_dictionary
 
 
 # Get the user inputted category from the database, store it in a list
@@ -478,6 +503,7 @@ def quiz_next_pair(a_dictionary):
 def quiz_click():
     # Change Title header
     title["text"] = "Quiz Time!"
+    text_entry_2['text'] = ''
 
     # Hide Edit button and input
     edit_button.grid_forget()
@@ -490,24 +516,19 @@ def quiz_click():
     quiz_topic_entry.grid_forget()
     lb.grid_forget()
     learn_button.grid_forget()
+    lb_as_user_updates.grid_forget()
 
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=7, padx=250)
-
-    # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
-    # in the dictionary. This removes that null pair during the quiz.
-    '''if len(main_dictionary) > 0:
-        if main_dictionary[""] == "":
-            del main_dictionary[""]
-    else:
-        pass'''
 
     # Hides the dictionary entries
     show_dictionary_as_user_updates.grid_forget()
 
     submit_button["text"] = "Check Answer"
 
+    # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
+    next_entry_button = tk.Button(text="Next", command=retrieve_category_pairs_from_database)
     # Bind next_entry_button
     next_entry_button.grid(column=6, row=5, padx=(300, 0))
 
@@ -546,7 +567,7 @@ def check_exist(dic, key, value):
 
 
 # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
-next_entry_button = tk.Button(text="Next", command=retrieve_category_pairs_from_database)
+# next_entry_button = tk.Button(text="Next", command=retrieve_category_pairs_from_database)
 
 
 # Function to check answer
@@ -619,7 +640,7 @@ def show_final_dictionaries():
     text_entry_2.grid_forget()
     answer_response.grid_forget()
     edit_button.grid_forget()
-    next_entry_button.grid_forget()
+    # next_entry_button.grid_forget()
     learn_button.grid_forget()
 
     good_pair_list = []
@@ -654,3 +675,4 @@ def show_final_dictionaries():
 
 if __name__ == "__main__":
     window.mainloop()
+
