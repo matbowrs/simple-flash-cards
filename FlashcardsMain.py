@@ -249,6 +249,12 @@ def set_text(text):
     return
 
 
+def set_text_2(text):
+    text_entry_2.delete(0, END)
+    text_entry_2.insert(0, text)
+    return
+
+
 # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
 # Also displays what the user is typing
 def create_pair_function():
@@ -394,6 +400,7 @@ def topic_for_quiz():
     retrieve_all_available_categories()
 
 
+# Retrieving all categories and storing them in a listbox
 def retrieve_all_available_categories():
     c.execute("SELECT DISTINCT category FROM cards")
     all_categories = c.fetchall()
@@ -411,6 +418,7 @@ def list_to_dictionary(my_list):
     return updated_dictionary
 
 
+# Get the user inputted category from the database, store it in a list
 def retrieve_category_pairs_from_database():
     # Get which category the user typed in
     user_category = str(quiz_topic_entry.get())
@@ -439,6 +447,7 @@ def retrieve_category_pairs_from_database():
     return updated_dictionary
 
 
+# Get the next pair during the quiz section
 def quiz_next_pair(a_dictionary):
     # Quiz section
     lb_as_user_updates.grid_forget()
@@ -458,6 +467,7 @@ def quiz_next_pair(a_dictionary):
     while list_of_keys[len(list_of_keys) - 1] == my_list[rand_num]:
         rand_num = randint(0, len(a_dictionary) - 1)
 
+    # Checks if the answer is correct
     submit_button["command"] = lambda: check_answer(a_dictionary)
 
     set_text(my_list[rand_num])
@@ -640,6 +650,7 @@ def show_final_dictionaries():
     append_to_dictionary()
 
 # <----- END MAIN FUNCTIONS ----->
+
 
 if __name__ == "__main__":
     window.mainloop()
