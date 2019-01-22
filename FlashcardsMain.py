@@ -293,6 +293,7 @@ def create_pair_function():
 submit_button = tk.Button(text="Create Pair", command=create_pair_function)
 submit_button.grid(column=6, row=6, padx=250)
 
+
 def learn_get_pairs():
     entry_for_deck_topic.grid_forget()
     title["text"] = "Let's learn"
@@ -361,6 +362,7 @@ def topic_for_quiz():
     submit_button.grid_forget()
     show_dictionary_as_user_updates.grid_forget()
     learn_button.grid_forget()
+    lb_as_user_updates.grid_forget()
 
     quiz_topic_entry.grid(column=6, row=2, padx=250, pady=(5, 0))
     quiz_topic_button.grid(column=6, row=3, padx=250)
@@ -384,6 +386,7 @@ def data_into_dictionary(x):
     # Where x is a list
     updated_dictionary = dict(t for t in zip(x[::2], x[1::2]))
     return updated_dictionary
+
 
 def retrieve_category_pairs_from_database():
     # Get which category the user typed in
@@ -436,6 +439,7 @@ def quiz_section(a_dictionary):
 
 # When the user is ready to quiz him/her, change the button text on ".submit_button" to "Check Answer"
 def quiz_click():
+    text_entry_2['text'] = ''
     # Change Title header
     title["text"] = "Quiz Time!"
 
@@ -457,11 +461,12 @@ def quiz_click():
 
     # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
     # in the dictionary. This removes that null pair during the quiz.
-    if len(main_dictionary) > 0:
+    '''if len(main_dictionary) > 0:
         if main_dictionary[""] == "":
             del main_dictionary[""]
     else:
         pass
+    '''
 
     # Hides the dictionary entries
     show_dictionary_as_user_updates.grid_forget()
