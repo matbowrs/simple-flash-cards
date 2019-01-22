@@ -26,7 +26,8 @@ def create_connection(db_file):
 
 
 def delete_category_entry():
-    c.execute("DELETE FROM cards WHERE category = '' OR category = 'cows' OR category = 'hey smile'")
+    c.execute("DELETE FROM cards WHERE category = 'state capitals' OR category = 'french words' "
+              "OR category = 'Capitals'")
 
 
 def select_all_cards(conn):
@@ -144,16 +145,6 @@ learn_button = tk.Button(text="Learn Topic", command="")
 # Declare command, used in quiz_click()
 done_button = tk.Button(text="", command="")
 
-# Globals for pre-made deck
-# Pre-made button for when user selects pre-made decks
-face_button = tk.Button(text="Parts of the Face (RUS/ENG)", command="")
-
-# Label for pre-made
-new_title = tk.Label(text="Select from  the pre-made decks below")
-
-# Inside pre-made, review button
-review_button = tk.Button(text="Review Words", command="")
-
 # <----- END GLOBAL VARIABLES -----
 
 # <-- BEGIN DICTIONARY DECLARATIONS -->
@@ -188,12 +179,10 @@ text_entry_2.grid(column=6, row=8, padx=250)
 
 # <----- BEGIN MAIN FUNCTIONS ----->
 create_new_deck_button = tk.Button(text="Create New Deck", command="")
-pre_made_button = tk.Button(text="Select From Pre-Made", command="")  # TODO Make pre-made things
 
 
 def create_topic_for_deck():
     create_new_deck_button.grid_forget()
-    pre_made_button.grid_forget()
 
     label_for_deck_topic.grid(column=6, row=0, padx=250, pady=(125, 5))
     entry_for_deck_topic.grid(column=6, row=1, padx=250)
@@ -219,7 +208,6 @@ def button_clicked_for_main_page():
     learn_button.grid(column=6, row=8, padx=175)
 
     create_new_deck_button.grid_forget()
-    pre_made_button.grid_forget()
     label_for_deck_topic.grid_forget()
     entry_for_deck_topic.grid_forget()
     create_deck_topic_button.grid_forget()
@@ -240,7 +228,6 @@ def main_page():
 
     create_new_deck_button.grid(column=6, row=4, padx=250, pady=(125, 10))
     learn_button.grid(column=6, row=5, padx=250)
-    pre_made_button.grid(column=6, row=6, padx=250)
 
     # on main_button click, run create_pair_function
     create_new_deck_button["command"] = create_topic_for_deck
@@ -280,11 +267,15 @@ def create_pair_function():
     show_dictionary_as_user_updates["text"] = store_dict_values
     show_dictionary_as_user_updates.grid(column=7, row=3)
 
+    lb_as_user_updates.grid(column=6, row=9)
+
     # Use list to show items in ListBox as user enters information
     for i in store_dict_values:
         lb_as_user_updates.insert(END, i)
 
-    lb_as_user_updates.grid(column=6, row=9)
+    # Send to database as user updates store_dit_values
+    # TODO put inside for loop just above???
+    send_to_database(main_dictionary)
 
     print(main_dictionary)
 
@@ -301,7 +292,6 @@ def learn_get_pairs():
 
 def learn_function():
     create_new_deck_button.grid_forget()
-    pre_made_button.grid_forget()
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=6, padx=250)
@@ -369,6 +359,7 @@ def topic_for_quiz():
 
     title["text"] = "Enter the topic for the quiz (the name you called the decks)"
     title.grid(column=6, row=0, padx=150)
+
     retrieve_all_available_categories()
 
 
@@ -377,6 +368,8 @@ def retrieve_all_available_categories():
     all_categories = c.fetchall()
 
     lb.grid(column=6, row=1, padx=250)
+
+    print(all_categories)
 
     for i in all_categories:
         lb.insert(END, i)
@@ -412,6 +405,13 @@ def retrieve_category_pairs_from_database():
     quiz_section(updated_dictionary)
 
     print("pairs in category => %s" % updated_dictionary)
+
+
+def send_to_database(a_dictionary):
+    for i in a_dictionary:
+        c.execute("INSERT INTO cards VALUES ('" + i + "','" + a_dictionary[
+            i] + "','" + get_card_deck_name() + "','" + "image" + "')")
+        conn.commit()
 
 
 def quiz_section(a_dictionary):
@@ -484,12 +484,7 @@ def quiz_click():
     done_button["command"] = show_final_dictionaries
     done_button.grid(column=6, row=8)
 
-    # Send to database when user clicks on Quiz Me
-    for i in main_dictionary:
-        c.execute("INSERT INTO cards VALUES ('" + i + "','" + main_dictionary[
-            i] + "','" + get_card_deck_name() + "','" + "image" + "')")
-        conn.commit()
-
+    # Shows first pair of words when quiz is started. If removed, it will appear blank until 'next' button is clicked
     retrieve_category_pairs_from_database()
 
 
@@ -617,52 +612,6 @@ def show_final_dictionaries():
 # <----- END MAIN FUNCTIONS ----->
 
 
-'''
-        # Pre-made Decks
-        # Hides main homepage
-        def click_pre_made():
-            .main_button.grid_forget()
-            .pre_made_button.grid_forget()
-            .edit_button.grid_forget()
-            .new_title.grid(column=1, row=0)
-            .face_button.grid(column=1, row=1)
-
-        # Hides buttons when passed as an argument
-        def hide_pre_made_button(name_of_button):
-            name_of_button.grid_forget()
-
-        # When clicked, run click_pre_made()
-        .pre_made_button["command"] = click_pre_made
-
-        # Setup for showing Face deck (hiding components, changing title, etc)
-        def pre_made_face_setup():
-            hide_pre_made_button(.face_button)
-
-            .new_title["text"] = "Russian <-> English Parts of Face"
-
-            .review_button = tk.Button(text="Review Words", command="")
-            .review_button.grid(column=1, row=1)
-            .quiz_button.grid(column=1, row=2)
-
-        .face_button["command"] = pre_made_face_setup
-
-        dict_rus_eng_face = {
-            "лицо": "face",
-            "голова": "head",
-            "волосы": "hair",
-            "лоб": "forehead",
-            "бровь": "eyebrow",
-            "ухо": "ear",
-            "глаз": "eye",
-            "рот": "mouth",
-            "нос": "nose",
-            "шея": "neck",
-            "зубы": "teeth",
-            "подбородок": "chin"
-        }
-
-        # def pass_in_dictionary(this_dict):
-'''
-
 if __name__ == "__main__":
     window.mainloop()
+
