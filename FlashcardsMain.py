@@ -93,8 +93,6 @@ main()
 # <------- HIGH PRIORITY ------->
 # TODO #5. "Learn" button at the home page
 # TODO #6. After user enters pairs, instead of quizzing right away, let the user learn them
-# TODO #7.  Fix {'':''} entries in database; drop them if they exist in either 1st or 2nd column
-
 
 # ----- GUI -----
 window = tk.Tk()
@@ -401,10 +399,9 @@ def retrieve_category_pairs_from_database():
     # Put everything from result[] into a dictionary
     updated_dictionary = data_into_dictionary(result)
 
-    # Logic for the quiz section, pass in the updated_dictionary
-    quiz_section(updated_dictionary)
-
     print("pairs in category => %s" % updated_dictionary)
+
+    return updated_dictionary
 
 
 def send_to_database(a_dictionary):
@@ -485,7 +482,7 @@ def quiz_click():
     done_button.grid(column=6, row=8)
 
     # Shows first pair of words when quiz is started. If removed, it will appear blank until 'next' button is clicked
-    retrieve_category_pairs_from_database()
+    quiz_section(retrieve_category_pairs_from_database())
 
 
 quiz_topic_button["command"] = quiz_click
@@ -506,7 +503,7 @@ def check_exist(dic, key, value):
 
 
 # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
-next_entry_button = tk.Button(text="Next", command=retrieve_category_pairs_from_database)
+next_entry_button = tk.Button(text="Next", command=lambda: quiz_section(retrieve_category_pairs_from_database()))
 
 
 # Function to check answer
@@ -614,4 +611,3 @@ def show_final_dictionaries():
 
 if __name__ == "__main__":
     window.mainloop()
-
