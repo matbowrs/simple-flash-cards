@@ -83,16 +83,11 @@ main()
 
 ''' <----- GUI And Logic ----->'''
 
-# TODO #1. Show dictionary as the user updates it !!DONE!! but, should I have this? !!!!!!!
-# TODO #1.1 If this feature is kept, problem with dictionary length
-
-# TODO #2. Redo GUI?
-# TODO #3. Remove all "print()" in final build
-# TODO #4. Try to fix { "" : "" } problem in the dictionary UI. It is fixed in the Quiz section
+# TODO #1. Have edit function?
+# TODO #2. Remove all "print()" in final build
 
 # <------- HIGH PRIORITY ------->
-# TODO #5. "Learn" button at the home page
-# TODO #6. After user enters pairs, instead of quizzing right away, let the user learn them
+# TODO #3. Fix so that when the user goes back to the main screen, there isn't a "replay bug"
 
 # ----- GUI -----
 window = tk.Tk()
@@ -181,6 +176,7 @@ create_new_deck_button = tk.Button(text="Create New Deck", command="")
 
 def create_topic_for_deck():
     create_new_deck_button.grid_forget()
+    learn_button.grid_forget()
 
     label_for_deck_topic.grid(column=6, row=0, padx=250, pady=(125, 5))
     entry_for_deck_topic.grid(column=6, row=1, padx=250)
@@ -203,8 +199,8 @@ def button_clicked_for_main_page():
     submit_button.grid(column=6, row=6, padx=175)
     quiz_button.grid(column=6, row=7, padx=175)
     edit_button.grid(column=7, row=6, padx=175)
-    learn_button.grid(column=6, row=8, padx=175)
 
+    learn_button.grid_forget()
     create_new_deck_button.grid_forget()
     label_for_deck_topic.grid_forget()
     entry_for_deck_topic.grid_forget()
@@ -223,6 +219,8 @@ def main_page():
     text_entry_2.grid_forget()
     title.grid_forget()
     edit_button.grid_forget()
+    done_button.grid_forget()
+    next_entry_button.grid_forget()
 
     create_new_deck_button.grid(column=6, row=4, padx=250, pady=(125, 10))
     learn_button.grid(column=6, row=5, padx=250)
@@ -236,6 +234,46 @@ def set_text(text):
     text_entry_1.delete(0, END)
     text_entry_1.insert(0, text)
     return
+
+
+def set_text_2(text):
+    text_entry_2.delete(0, END)
+    text_entry_2.insert(0, text)
+    return
+
+
+# Allows edits to be performed on the second definition only; requires the first definition (the key) to work!
+def edit_function():
+    # Bind all edit objects to grid
+    edit_label.grid(column=4, row=3)
+    edit_entry_1.grid(column=4, row=4)
+    edit_entry_2.grid(column=4, row=5)
+
+    # Change edit_button text to Submit New Entry
+    edit_button["text"] = "Submit New Entry"
+
+    # Vars to store input from user in the Edit section
+    new_edit_var = str(edit_entry_1.get())
+    new_edit_var_2 = str(edit_entry_2.get())
+
+    # Replace the values
+    main_dictionary[new_edit_var] = new_edit_var_2
+
+    # Update printed dictionary in UI
+    # Show the dictionary as the user enters pairs
+    store_dict_values = []
+    for key in main_dictionary.items():
+        store_dict_values.append(key)
+
+    show_dictionary_as_user_updates["text"] = store_dict_values
+    show_dictionary_as_user_updates.grid(column=7, row=3)
+
+    print(main_dictionary)
+
+
+# Edit button
+edit_button = tk.Button(text="Edit", command=edit_function)
+edit_button.grid(column=7, row=6)
 
 
 # When user clicks button, get text from text_entry_1 & text_entry_2 and put into dictionary
@@ -272,7 +310,6 @@ def create_pair_function():
         lb_as_user_updates.insert(END, i)
 
     # Send to database as user updates store_dit_values
-    # TODO put inside for loop just above???
     send_to_database(main_dictionary)
 
     print(main_dictionary)
@@ -281,6 +318,75 @@ def create_pair_function():
 # Submit button
 submit_button = tk.Button(text="Create Pair", command=create_pair_function)
 submit_button.grid(column=6, row=6, padx=250)
+
+
+def learn_section(a_dictionary):
+    # Learn section, kept here for scope reasons
+    list_of_keys = []
+
+    # Stores the keys
+    my_keys = []
+
+    # Stores the values
+    my_values = []
+
+    for x, y in a_dictionary.items():
+        my_keys.append(x)
+        my_values.append(y)
+
+    list_of_keys.append(text_entry_1.get())
+
+    # Used for selection when choosing a value for quizzing the user
+    rand_num = randint(0, len(a_dictionary) - 1)
+
+    # If the last entry and the new entry-to-be are the same, make the new entry-to-be different
+    while list_of_keys[len(list_of_keys) - 1] == my_keys[rand_num]:
+        rand_num = randint(0, len(a_dictionary) - 1)
+
+    # Set the text using a random number, the key and the value
+    set_text(my_keys[rand_num])
+    set_text_2(my_values[rand_num])
+    print(my_keys[rand_num])
+
+
+next_entry_button = tk.Button(text="Next", command='')
+
+
+def learn_click():
+    # Change Title header
+    title["text"] = "Let's learn!"
+
+    # Hide Edit button and input
+    edit_button.grid_forget()
+    edit_button.grid_forget()
+    edit_label.grid_forget()
+    edit_entry_1.grid_forget()
+    edit_entry_2.grid_forget()
+    append_button.grid_forget()
+    quiz_topic_button.grid_forget()
+    quiz_topic_entry.grid_forget()
+    lb.grid_forget()
+    learn_button.grid_forget()
+    show_dictionary_as_user_updates.grid_forget()
+    submit_button.grid_forget()
+
+    text_entry_1.grid(column=6, row=4, padx=250, pady=50)
+    text_entry_2.grid(column=6, row=5, padx=250)
+
+    # Bind next_entry_button
+    next_entry_button.grid(column=6, row=5, padx=(300, 0))
+    next_entry_button['command'] = lambda: learn_section(retrieve_category_pairs_from_database())
+
+    # Remove the quiz button from the UI
+    quiz_button.grid_forget()
+
+    # Done button takes user back to main_page()
+    done_button["text"] = "Done"
+    done_button["command"] = main_page
+    done_button.grid(column=6, row=8)
+
+    # Shows first pair of words when learn section is started
+    learn_section(retrieve_category_pairs_from_database())
 
 
 def learn_get_pairs():
@@ -293,46 +399,21 @@ def learn_function():
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=6, padx=250)
-    submit_button['command'] = ''
     # next_entry_button.grid(column=6, row=7, padx=250)
     topic_for_quiz()
+
+    # quiz_topic_button is the button at the screen where the user chooses a topic to quiz/study over.
+    # This changes the command of the button to def learn_function()
+    quiz_topic_button['command'] = learn_click
 
 
 learn_button['command'] = learn_function
 
 
-# Allows edits to be performed on the second definition only; requires the first definition (the key) to work!
-def edit_function():
-    # Bind all edit objects to grid
-    edit_label.grid(column=4, row=3)
-    edit_entry_1.grid(column=4, row=4)
-    edit_entry_2.grid(column=4, row=5)
-
-    # Change edit_button text to Submit New Entry
-    edit_button["text"] = "Submit New Entry"
-
-    # Vars to store input from user in the Edit section
-    new_edit_var = str(edit_entry_1.get())
-    new_edit_var_2 = str(edit_entry_2.get())
-
-    # Replace the values
-    main_dictionary[new_edit_var] = new_edit_var_2
-
-    # Update printed dictionary in UI
-    # Show the dictionary as the user enters pairs
-    store_dict_values = []
-    for key in main_dictionary.items():
-        store_dict_values.append(key)
-
-    show_dictionary_as_user_updates["text"] = store_dict_values
-    show_dictionary_as_user_updates.grid(column=7, row=3)
-
-    print(main_dictionary)
-
-
-# Edit button
-edit_button = tk.Button(text="Edit", command=edit_function)
-edit_button.grid(column=7, row=6)
+def data_into_dictionary(x):
+    # Where x is a list
+    updated_dictionary = dict(t for t in zip(x[::2], x[1::2]))
+    return updated_dictionary
 
 
 # Asks user for category, then retrieve the database
@@ -373,12 +454,6 @@ def retrieve_all_available_categories():
         lb.insert(END, i)
 
 
-def data_into_dictionary(x):
-    # Where x is a list
-    updated_dictionary = dict(t for t in zip(x[::2], x[1::2]))
-    return updated_dictionary
-
-
 def retrieve_category_pairs_from_database():
     # Get which category the user typed in
     user_category = str(quiz_topic_entry.get())
@@ -396,6 +471,7 @@ def retrieve_category_pairs_from_database():
         for x in t:
             result.append(x)
 
+    print(result)
     # Put everything from result[] into a dictionary
     updated_dictionary = data_into_dictionary(result)
 
@@ -503,7 +579,8 @@ def check_exist(dic, key, value):
 
 
 # Button to show next entry during the quiz; HERE FOR SCOPE ISSUE
-next_entry_button = tk.Button(text="Next", command=lambda: quiz_section(retrieve_category_pairs_from_database()))
+# next_entry_button = tk.Button(text="Next", command=lambda: quiz_section(retrieve_category_pairs_from_database()))
+next_entry_button['command'] = lambda: quiz_section(retrieve_category_pairs_from_database())
 
 
 # Function to check answer
@@ -602,7 +679,9 @@ def show_final_dictionaries():
     bad_dictionary_label["text"] = bad_pair_list
     bad_dictionary_label.grid(column=3, row=4, padx=275)
 
-    done_button.grid(column=3, row=5, padx=275, pady=(20,5))
+    done_button.grid(column=3, row=5, padx=275, pady=(20, 5))
+    done_button['command'] = main_page
+
     # Show append button at the end
     append_to_dictionary()
 
