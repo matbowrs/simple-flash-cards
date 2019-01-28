@@ -424,6 +424,8 @@ def topic_for_quiz():
     edit_label.grid_forget()
     edit_entry_1.grid_forget()
     edit_entry_2.grid_forget()
+    done_button.grid_forget()
+    next_entry_button.grid_forget()
     append_button.grid_forget()
     text_entry_1.grid_forget()
     text_entry_2.grid_forget()
