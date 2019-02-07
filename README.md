@@ -7,7 +7,7 @@ is for it to function similarly to using flashcards.
 
 # Running
 The user will run the program using the following command in the 
-command line: python3 FlashCardsGUI.py . 
+command line: python3 FlashCardsMain.py . 
 
 The user will then
 enter a word and definition (or any other combination of pairs,
