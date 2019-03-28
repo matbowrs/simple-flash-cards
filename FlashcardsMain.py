@@ -288,6 +288,10 @@ def create_pair_function():
     def_2 = str(text_entry_2.get())
     main_dictionary[def_1] = def_2
 
+    text_entry_1.delete(0, END)
+    text_entry_2.delete(0, END)
+
+
     # Solves problem if the user goes to quiz right away and doesn't need to edit. Why? I don't know but it
     # works so don't touch it :)
     main_dictionary[""] = ""
@@ -525,6 +529,7 @@ def quiz_section(a_dictionary):
 
 # When the user is ready to quiz him/her, change the button text on ".submit_button" to "Check Answer"
 def quiz_click():
+
     text_entry_2['text'] = ''
     # Change Title header
     title["text"] = "Quiz Time!"
