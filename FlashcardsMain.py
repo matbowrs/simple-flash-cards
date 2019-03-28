@@ -505,6 +505,9 @@ def send_to_database(a_dictionary):
 
 
 def quiz_section(a_dictionary):
+
+    text_entry_2.delete(0, END)
+
     # Quiz section, kept here for scope reasons
     list_of_keys = []
     my_list = []
