@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import *
 from random import randint
+
+
+# For database
 import sqlite3
 from sqlite3 import Error
 
@@ -306,8 +309,12 @@ def create_pair_function():
     lb_as_user_updates.grid(column=6, row=9)
 
     # Use list to show items in ListBox as user enters information
+    lb_as_user_updates.delete(0, END)
+
     for i in store_dict_values:
-        lb_as_user_updates.insert(END, i)
+       lb_as_user_updates.insert(END, i)
+    #lb_as_user_updates.delete(0, END)
+    #lb_as_user_updates.insert(END, store_dict_values)
 
     # Send to database as user updates store_dit_values
     send_to_database(main_dictionary)
@@ -452,6 +459,10 @@ def retrieve_all_available_categories():
 
     print(all_categories)
 
+    # Delete everything in list box so that it can be added without repeats
+    lb.delete(0, END)
+
+    # Add values into the listbox
     for i in all_categories:
         lb.insert(END, i)
 
