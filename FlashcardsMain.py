@@ -183,7 +183,7 @@ def create_topic_for_deck():
     create_new_deck_button.grid_forget()
     learn_button.grid_forget()
     quiz_button.grid_forget()
-    text_entry_1.delete(0, END) # ?
+    text_entry_1.delete(0, END)
     label_for_deck_topic.grid(column=6, row=0, padx=250, pady=(125, 5))
     entry_for_deck_topic.grid(column=6, row=1, padx=250)
     create_deck_topic_button.grid(column=6, row=2, padx=250)
@@ -232,6 +232,7 @@ def main_page():
     title_2.grid_forget()
     create_new_deck_button.grid(column=6, row=4, padx=250, pady=(125, 10))
     learn_button.grid(column=6, row=5, padx=250)
+    quiz_button.grid(column=6, row=6, padx=250)
 
     # on main_button click, run create_pair_function
     create_new_deck_button["command"] = create_topic_for_deck
@@ -251,6 +252,7 @@ def set_text_2(text):
 
 
 # Allows edits to be performed on the second definition only; requires the first definition (the key) to work!
+# NEVER USED, KEPT MAYBE FOR THE FUTURE?
 def edit_function():
     # Bind all edit objects to grid
     edit_label.grid(column=4, row=3)
@@ -409,7 +411,6 @@ def learn_function():
     text_entry_1.grid(column=6, row=4, padx=250, pady=50)
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=6, padx=250)
-    # next_entry_button.grid(column=6, row=7, padx=250)
     topic_for_quiz()
 
     submit_button["command"] = create_pair_function
