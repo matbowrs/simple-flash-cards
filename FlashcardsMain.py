@@ -89,9 +89,6 @@ main()
 # TODO #1. Have edit function?
 # TODO #2. Remove all "print()" in final build
 
-# <------- HIGH PRIORITY ------->
-# TODO #3. Fix so that when the user goes back to the main screen, there isn't a "replay bug"
-
 # ----- GUI -----
 window = tk.Tk()
 
@@ -154,6 +151,11 @@ bad_dictionary = {}
 # If user gets definition correct, pair is sent here
 good_dictionary = {}
 
+good_dictionary_label = tk.Label(text="")
+bad_dictionary_label = tk.Label(text="")
+
+title_2 = tk.Label(text="What you got wrong: ")
+
 # <-- END DICTIONARY DECLARATIONS -->
 
 # <--- START LABELS --->
@@ -180,7 +182,8 @@ create_new_deck_button = tk.Button(text="Create New Deck", command="")
 def create_topic_for_deck():
     create_new_deck_button.grid_forget()
     learn_button.grid_forget()
-
+    quiz_button.grid_forget()
+    text_entry_1.delete(0, END) # ?
     label_for_deck_topic.grid(column=6, row=0, padx=250, pady=(125, 5))
     entry_for_deck_topic.grid(column=6, row=1, padx=250)
     create_deck_topic_button.grid(column=6, row=2, padx=250)
@@ -217,14 +220,16 @@ def button_clicked_for_main_page():
 def main_page():
     append_button.grid_forget()
     submit_button.grid_forget()
-    quiz_button.grid_forget()
+    # quiz_button.grid_forget()
     text_entry_1.grid_forget()
     text_entry_2.grid_forget()
     title.grid_forget()
     edit_button.grid_forget()
     done_button.grid_forget()
     next_entry_button.grid_forget()
-
+    bad_dictionary_label.grid_forget()
+    good_dictionary_label.grid_forget()
+    title_2.grid_forget()
     create_new_deck_button.grid(column=6, row=4, padx=250, pady=(125, 10))
     learn_button.grid(column=6, row=5, padx=250)
 
@@ -291,7 +296,6 @@ def create_pair_function():
     text_entry_1.delete(0, END)
     text_entry_2.delete(0, END)
 
-
     # Solves problem if the user goes to quiz right away and doesn't need to edit. Why? I don't know but it
     # works so don't touch it :)
     main_dictionary[""] = ""
@@ -307,18 +311,13 @@ def create_pair_function():
     for key in main_dictionary.items():
         store_dict_values.append(key)
 
-    show_dictionary_as_user_updates["text"] = store_dict_values
-    show_dictionary_as_user_updates.grid(column=7, row=3)
-
     lb_as_user_updates.grid(column=6, row=9)
 
     # Use list to show items in ListBox as user enters information
     lb_as_user_updates.delete(0, END)
 
     for i in store_dict_values:
-       lb_as_user_updates.insert(END, i)
-    #lb_as_user_updates.delete(0, END)
-    #lb_as_user_updates.insert(END, store_dict_values)
+        lb_as_user_updates.insert(END, i)
 
     # Send to database as user updates store_dit_values
     send_to_database(main_dictionary)
@@ -413,6 +412,7 @@ def learn_function():
     # next_entry_button.grid(column=6, row=7, padx=250)
     topic_for_quiz()
 
+    submit_button["command"] = create_pair_function
     # quiz_topic_button is the button at the screen where the user chooses a topic to quiz/study over.
     # This changes the command of the button to def learn_function()
     quiz_topic_button['command'] = learn_click
@@ -445,6 +445,8 @@ def topic_for_quiz():
     show_dictionary_as_user_updates.grid_forget()
     learn_button.grid_forget()
     lb_as_user_updates.grid_forget()
+    create_new_deck_button.grid_forget()
+    create_deck_topic_button.grid_forget()
 
     quiz_topic_entry.grid(column=6, row=2, padx=250, pady=(5, 0))
     quiz_topic_button.grid(column=6, row=3, padx=250)
@@ -505,7 +507,8 @@ def send_to_database(a_dictionary):
 
 
 def quiz_section(a_dictionary):
-
+    create_deck_topic_button.grid_forget()
+    create_new_deck_button.grid_forget()
     text_entry_2.delete(0, END)
 
     # Quiz section, kept here for scope reasons
@@ -553,15 +556,6 @@ def quiz_click():
     text_entry_2.grid(column=6, row=5, padx=250)
     submit_button.grid(column=6, row=7, padx=250)
 
-    # Solves a problem with the Edit Function. While hitting Edit, a null pair would be set
-    # in the dictionary. This removes that null pair during the quiz.
-    '''if len(main_dictionary) > 0:
-        if main_dictionary[""] == "":
-            del main_dictionary[""]
-    else:
-        pass
-    '''
-
     # Hides the dictionary entries
     show_dictionary_as_user_updates.grid_forget()
 
@@ -576,6 +570,8 @@ def quiz_click():
     # Done button for when user is done taking the quiz; replaces .quiz_button
     done_button["text"] = "Done"
     done_button["command"] = show_final_dictionaries
+    # done_button["command"] = main_page
+    append_button["command"] = main_page
     done_button.grid(column=6, row=8)
 
     # Shows first pair of words when quiz is started. If removed, it will appear blank until 'next' button is clicked
@@ -656,13 +652,6 @@ def append_to_dictionary():
 
 # Home page is down here. Yeah, I know...
 main_page()
-
-# For scope, goes with below function
-title_2 = tk.Label(text="What you got wrong: ")
-
-# For Scope
-good_dictionary_label = tk.Label(text="")
-bad_dictionary_label = tk.Label(text="")
 
 
 # When the user is fully done with the program and wants to show what they got correct
